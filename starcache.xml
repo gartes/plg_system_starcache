@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="3.1" type="plugin" group="system" method="upgrade">
+	<name>PLG_SYSTEM_STARCACHE</name>
+	<author>Joomla! Project</author>
+	<creationDate>February 2007</creationDate>
+	<copyright>Copyright (C) 2005 - 2018 Open Source Matters. All rights reserved.</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<authorEmail></authorEmail>
+	<authorUrl></authorUrl>
+	<version>3.0.4</version>
+	<description>PLG_CACHE_XML_DESCRIPTION</description>
+	<files>
+		<folder>helpers</folder>
+		<folder>language</folder>
+		<filename plugin="starcache">starcache.php</filename>
+	</files>
+
+	<config>
+		<fields name="params">
+            <fieldset name="UKCPU_Lib">
+                <field
+					name="ukcpu_lib_view"
+					type="radio"
+					label="PLG_CACHE_UKCPU_LIB_VIEW_LABEL"
+					 
+					class="btn-group btn-group-yesno"
+					default="0"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+                
+                <field
+					name="mediaVersion"
+					type="text"
+					label="PLG_CACHE_UKCPU_MEDIA_VERSION_LABEL"
+					default="0" >
+					 
+				</field>
+                
+                
+            </fieldset>
+			<fieldset name="basic">
+				
+                <field
+					name="cache_on"
+					type="radio"
+					label="PLG_CACHE_CACHE_ON_LABEL"
+					 
+					class="btn-group btn-group-yesno"
+					default="0"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+                
+                <field
+					name="browsercache"
+					type="radio"
+					label="PLG_CACHE_FIELD_BROWSERCACHE_LABEL"
+					description="PLG_CACHE_FIELD_BROWSERCACHE_DESC"
+					class="btn-group btn-group-yesno"
+					default="0"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+
+				<field
+					name="exclude_menu_items"
+					type="menuitem"
+					label="PLG_CACHE_FIELD_EXCLUDE_MENU_ITEMS_LABEL"
+					description="PLG_CACHE_FIELD_EXCLUDE_MENU_ITEMS_DESC"
+					default=""
+					multiple="multiple"
+				/>
+
+			</fieldset>
+			<fieldset name="advanced">
+				<field
+					name="exclude"
+					type="textarea"
+					label="PLG_CACHE_FIELD_EXCLUDE_LABEL"
+					description="PLG_CACHE_FIELD_EXCLUDE_DESC"
+					class="input-xxlarge"
+					rows="15"
+					filter="raw"
+					default=""
+				/>
+
+			</fieldset>
+		</fields>
+	</config>
+</extension>

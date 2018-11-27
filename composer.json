@@ -1,0 +1,21 @@
+{
+    "name": "root/starcache",
+    "description": "Composer for starcache",
+    "authors": [
+        {
+            "name": "gartes",
+            "email": "sad.net79@gmail.com"
+        }
+    ],
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "require": {
+
+    },
+    "autoload" :{
+            "psr-4":{
+                "starcache\\": ""
+            }
+    }
+}
