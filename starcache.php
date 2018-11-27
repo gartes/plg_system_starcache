@@ -1,5 +1,8 @@
 <?php namespace starcache;
 
+use JCache;
+use JFactory;
+
 /**
  * @package     Joomla.Plugin
  * @subpackage  System.cache
@@ -10,17 +13,15 @@
 
 defined('_JEXEC') or die;
 
-require_once JPATH_PLUGINS . '/system/starcache/vendor/autoload.php' ;
+$PATH_autoload = JPATH_PLUGINS . "/system/starcache/vendor/autoload.php" ;
+
+
+require_once  $PATH_autoload ;
 
 
 
-require 'vendor/autoload.php';
-$scripts = new \starcache\helpers\scripts();
+//require 'vendor/autoload.php';
 
-
-
-echo'<pre>';print_r( $scripts );echo'</pre>'.__FILE__.' '.__LINE__;
-die(__FILE__ .' Lines '. __LINE__ );
 
 /**
  * Joomla! Page Cache Plugin.
@@ -32,7 +33,7 @@ class PlgSystemStarcache extends \JPlugin
 	/**
 	 * Cache instance.
 	 *
-	 * @var    \JCache
+	 * @var    JCache
 	 * @since  3.7
 	 */
 	public $_cache;
@@ -63,7 +64,7 @@ class PlgSystemStarcache extends \JPlugin
 	 * @param   object  &$subject The object to observe.
 	 * @param   array    $config  An optional associative array of configuration settings.
 	 *
-	 * @throws Exception
+	 * @throws \Exception
 	 * @since   3.7
 	 *
 	 *
@@ -73,7 +74,7 @@ class PlgSystemStarcache extends \JPlugin
 		
 		
 		
-		
+		die(__FILE__ .' Lines '. __LINE__ );
 		
 		
 		
@@ -100,13 +101,14 @@ class PlgSystemStarcache extends \JPlugin
      * Перед созданием HEAD
      *
      * @since 3.8
+     *
      */ 
     public function onBeforeCompileHead(){
-    	
-	    
-    	
-    	if (JFactory::getApplication()->isAdmin())  return;
 	
+	   
+    	
+    	 if ( $this->app->isAdmin())  return;
+	  
 	    // $this->_removeScripts($doc);
     
         
@@ -171,11 +173,16 @@ class PlgSystemStarcache extends \JPlugin
 	
 	
     
-    public function onAfterRender(){}
+    public function onAfterRender(){
+	
+	    $scripts = new \starcache\helpers\scripts();
+	    echo'<pre>';print_r( $scripts );echo'</pre>'.__FILE__.' '.__LINE__;
+	    die(__FILE__ .' Lines '. __LINE__ );
+    }#END FUN
 	
 	
 	public function onAfterRoute(){
-        
+		
     //     jimport('ukcpu.document.document');
         
         $doc = JFactory::getDocument();
