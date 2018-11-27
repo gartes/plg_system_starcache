@@ -53,6 +53,10 @@ class PlgSystemStarcache extends \JPlugin
 	 */
 	protected $app;
 	
+	
+	
+	
+	
 	/**
 	 *  * Constructor.
 	 *
