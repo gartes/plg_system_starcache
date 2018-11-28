@@ -69,7 +69,7 @@ class PlgSystemStarcache extends \JPlugin
 	 *
 	 *
 	 */
-	public function __construct(& $subject, $config)
+	public function __construct(&$subject, $config)
 	{
 		
 		
