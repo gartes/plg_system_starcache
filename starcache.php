@@ -16,6 +16,7 @@ jimport('joomla.plugin.plugin');
 $PATH_autoload = JPATH_PLUGINS . "/system/starcache/vendor/autoload.php" ;
 
 
+/** @var PlgSystemStarcache $PATH_autoload */
 require_once  $PATH_autoload ;
 
 
