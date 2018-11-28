@@ -12,7 +12,7 @@ use JFactory;
  */
 
 defined('_JEXEC') or die;
-
+jimport('joomla.plugin.plugin');
 $PATH_autoload = JPATH_PLUGINS . "/system/starcache/vendor/autoload.php" ;
 
 
