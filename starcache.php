@@ -1,7 +1,5 @@
-<?php namespace starcache;
+<?php //namespace starcache;
 
-use JCache;
-use JFactory;
 
 /**
  * @package     Joomla.Plugin
@@ -74,8 +72,7 @@ class PlgSystemStarcache extends \JPlugin
 	{
 		
 		
-		
-		die(__FILE__ .' Lines '. __LINE__ );
+	
 		
 		
 		
@@ -177,8 +174,8 @@ class PlgSystemStarcache extends \JPlugin
     public function onAfterRender(){
 	
 	    $scripts = new \starcache\helpers\scripts();
-	    echo'<pre>';print_r( $scripts );echo'</pre>'.__FILE__.' '.__LINE__;
-	    die(__FILE__ .' Lines '. __LINE__ );
+	   /* echo'<pre>';print_r( $scripts );echo'</pre>'.__FILE__.' '.__LINE__;
+	    die(__FILE__ .' Lines '. __LINE__ );*/
     }#END FUN
 	
 	
@@ -194,14 +191,17 @@ class PlgSystemStarcache extends \JPlugin
 	    $mediaVersion = $this->params->get( 'mediaVersion', $doc->getMediaVersion() );
      
 	    #Если включен режим ращработчика
-        if ( !$lib_view  ){
+        if ( !$lib_view  || ( $lib_view && !$mediaVersion )  ){
+	
+        	if ( !class_exists( 'Core\Core' ) )  require JPATH_LIBRARIES . '/zaz/Core/Core.php';
+        	
         	#Создать новый ID Медиа версии
             $mediaVersion = JUserHelper::genRandomPassword ($length = 16) ;
         }#END IF
 	    #Установить ID Медиа версии
         $doc->setMediaVersion($mediaVersion);
         
- 
+        
         
         
                

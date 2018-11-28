@@ -18,14 +18,8 @@
 		<filename>starcache.xml</filename>
 		<filename>composer.json</filename>
 		<filename>.gitignore</filename>
-
-	</files>
-
-
-
-
-
-	<config>
+    </files>
+    <config>
 		<fields name="params">
             <fieldset name="UKCPU_Lib">
                 <field
