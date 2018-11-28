@@ -18,8 +18,11 @@
 		<filename>starcache.xml</filename>
 		<filename>composer.json</filename>
 		<filename>.gitignore</filename>
-    </files>
-    <config>
+
+	</files>
+
+
+	<config>
 		<fields name="params">
             <fieldset name="UKCPU_Lib">
                 <field
@@ -38,7 +41,7 @@
 					name="mediaVersion"
 					type="text"
 					label="PLG_CACHE_UKCPU_MEDIA_VERSION_LABEL"
-					default="0" >
+					default="" >
 					 
 				</field>
                 

@@ -1,5 +1,4 @@
-<?php //namespace starcache;
-
+<?php
 
 /**
  * @package     Joomla.Plugin
@@ -12,9 +11,6 @@
 defined('_JEXEC') or die;
 jimport('joomla.plugin.plugin');
 $PATH_autoload = JPATH_PLUGINS . "/system/starcache/vendor/autoload.php" ;
-
-
-/** @var PlgSystemStarcache $PATH_autoload */
 require_once  $PATH_autoload ;
 
 
@@ -29,6 +25,23 @@ require_once  $PATH_autoload ;
  */
 class PlgSystemStarcache extends \JPlugin
 {
+	/**
+	 * The name of the plugin
+	 *
+	 * @var    string
+	 * @since  1.5
+	 */
+	public $_name = null;
+	
+	/**
+	 * The plugin type
+	 *
+	 * @var    string
+	 * @since  1.5
+	 */
+	public $_type = null;
+	
+	
 	/**
 	 * Cache instance.
 	 *
@@ -54,7 +67,9 @@ class PlgSystemStarcache extends \JPlugin
 	protected $app;
 	
 	
-	
+	private $_scripts = array();
+	private $_script = '';
+	private $_mediaVersion;
 	
 	
 	/**
@@ -71,11 +86,6 @@ class PlgSystemStarcache extends \JPlugin
 	public function __construct(&$subject, $config)
 	{
 		
-		
-	
-		
-		
-		
 		parent::__construct($subject, $config);
         
         // Set the language in the class.
@@ -90,10 +100,8 @@ class PlgSystemStarcache extends \JPlugin
 		{
 			$this->app = JFactory::getApplication();
 		}
-         
         $this->_cache     = JCache::getInstance('page', $options);
-	
-    }
+	}#END FN
     
     /**
      * Перед созданием HEAD
@@ -112,113 +120,49 @@ class PlgSystemStarcache extends \JPlugin
         
     }#END FN
 	
-	/**
-	 * Pick up js file downloaders
-	 *
-	 *
-	 * @param $doc
-	 *
-	 * @author    Gartes
-	 * @since     3.8
-	 * @copyright 27.11.18
-	 *
-	 */
-	private function _removeScripts( $doc ) {
-		
-		$regex = $this->_prepExclude((array) $this->params->get('scripts', array()));
-		$matched = array();
-		$regexinclude = $this->params->get('include', false);
-		
-		
-		
-		foreach ($regex as $r){
-			
-			$match = preg_grep('/' . $r . '/', array_keys($doc->_scripts));
-			$matched = array_merge($matched, $match);
-			
-		}#END FOREACH
-		
-		
-		
-		
-		foreach ($doc->_scripts as $src => $attribs){
-			
-			if (!$regexinclude)
-			{
-				if (!in_array($src, $matched))
-				{
-					$this->_scripts[$src] = $attribs;
-					unset($doc->_scripts[$src]);
-				}#END IF
-				continue;
-			}#END IF
-			
-			if (in_array($src, $matched))
-			{
-				
-				$attribs['defer'] = 1 ;
-				$attribs['options']['defer'] = 1 ;
-				
-				
-				$this->_scripts[$src] = $attribs;
-				unset($doc->_scripts[$src]);
-				
-			}#END IF
-			
-		}#END FOREACH
-		
-	}#END FUN
+	
 	
 	
     
     public function onAfterRender(){
 	
 	    $scripts = new \starcache\helpers\scripts();
-	   /* echo'<pre>';print_r( $scripts );echo'</pre>'.__FILE__.' '.__LINE__;
-	    die(__FILE__ .' Lines '. __LINE__ );*/
+	   
     }#END FUN
 	
 	
 	public function onAfterRoute(){
 		
-    //     jimport('ukcpu.document.document');
-        
         $doc = JFactory::getDocument();
          
         #Режим USER ?
-	    $lib_view = $this->params->get( 'ukcpu_lib_view', false );
+	    $user_view_param = $this->params->get( 'ukcpu_lib_view', false );
         #ID Медиа версии
-	    $mediaVersion = $this->params->get( 'mediaVersion', $doc->getMediaVersion() );
-     
-	    #Если включен режим ращработчика
-        if ( !$lib_view  || ( $lib_view && !$mediaVersion )  ){
-	
-        	if ( !class_exists( 'Core\Core' ) )  require JPATH_LIBRARIES . '/zaz/Core/Core.php';
-        	
-        	#Создать новый ID Медиа версии
-            $mediaVersion = JUserHelper::genRandomPassword ($length = 16) ;
-        }#END IF
-	    #Установить ID Медиа версии
-        $doc->setMediaVersion($mediaVersion);
+	    $mediaVersion = $this->params->get( 'mediaVersion', false );
+		
+		#Если включен режим ращработчика
+		#или mediaVersion - не установлкна
+		if ( ($user_view_param && !$mediaVersion ) ||  !$user_view_param     )
+		{
+			
+			$mediaVersion = JUserHelper::genRandomPassword( $length = 16 );
+			$this->params->set('mediaVersion' , $mediaVersion );
+			
+			if ( !class_exists( 'Core\zazCore' ) )  require JPATH_LIBRARIES . '/zaz/Core/zazCore.php';
+			
+			$extensions= new \Core\extensions\zazExtensions();
+			$PluginId = $extensions->getJoomlaPluginId($this) ;
+			$extensions->updateExtensionParams ( $this->params->toString() , $PluginId ) ;
+		
+		} #END IF
+		#Установить ID Медиа версии
+		$doc->setMediaVersion( $mediaVersion );
+        
+ 
         
         
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-               
-                    
         
         
         # config class ukcpuDocument
@@ -229,7 +173,7 @@ class PlgSystemStarcache extends \JPlugin
         
                     // developer  ||  user
         
-        'view'          =>      ( $lib_view ? 'user' :'developer' )       , 
+        'view'          =>      ( $user_view_param ? 'user' :'developer' )       ,
         'mediaVersion'  =>      $mediaVersion , 
         'cache'         =>      true                , // Кешировать результаты true || false
         /**
@@ -491,6 +435,10 @@ class PlgSystemStarcache extends \JPlugin
 	 */
 	public function onAjaxStarcache (){
 		
+		
+		
+		
+		
 		jimport('ukcpu.extensions.extensions');
 		
 		$pluginData  = ukcpuExtensions::getItemByElement('starcache', 'plugin', 'system') ;
@@ -539,16 +487,16 @@ class PlgSystemStarcache extends \JPlugin
 				{
 					$newMediaVersion = JUserHelper::genRandomPassword ($length = 8) ;
 					
-					$lib_view = $this->params->get( 'ukcpu_lib_view', false );
-					$this->params->set('ukcpu_lib_view' , ( $lib_view ? 0 : 1 ) ) ;
-					$this->params->set('cache_on' , ( $lib_view ? 0 : 1 ) ) ;
+					$user_view_param = $this->params->get( 'ukcpu_lib_view', false );
+					$this->params->set('ukcpu_lib_view' , ( $user_view_param ? 0 : 1 ) ) ;
+					$this->params->set('cache_on' , ( $user_view_param ? 0 : 1 ) ) ;
 					$this->params->set('mediaVersion' , $newMediaVersion ) ;
 					
 					
 					$R = ukcpuExtensions::saveParametersExtensions( $extensionsId, $this->params ) ;
 					$this->app->enqueueMessage('Медиа версия изменена - Media Version = <b>' . $newMediaVersion .'</b>'  );
-					$this->app->enqueueMessage('JCahe <b>' . ( $lib_view ? 'Отключен' : 'Включен' ) .'</b>.');
-					$this->app->enqueueMessage('Включен режим <b>' . ( $lib_view ? 'Dev.' : 'User' ).'</b>' );
+					$this->app->enqueueMessage('JCahe <b>' . ( $user_view_param ? 'Отключен' : 'Включен' ) .'</b>.');
+					$this->app->enqueueMessage('Включен режим <b>' . ( $user_view_param ? 'Dev.' : 'User' ).'</b>' );
 					
 					
 				}catch(Exception $e){
