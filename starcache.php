@@ -7,8 +7,10 @@
  * @copyright   Copyright (C) 2005 - 2018 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
-
-defined('_JEXEC') or die;
+	
+	use starcache\helpers\scripts;
+	
+	defined('_JEXEC') or die('Restricted access');
 jimport('joomla.plugin.plugin');
 $PATH_autoload = JPATH_PLUGINS . "/system/starcache/vendor/autoload.php" ;
 require_once  $PATH_autoload ;
@@ -67,9 +69,9 @@ class PlgSystemStarcache extends \JPlugin
 	protected $app;
 	
 	
-	private $_scripts = array();
-	private $_script = '';
-	private $_mediaVersion;
+	public $_scripts = array();
+	public $_script = '';
+	public $_mediaVersion;
 	
 	
 	/**
@@ -101,6 +103,9 @@ class PlgSystemStarcache extends \JPlugin
 			$this->app = JFactory::getApplication();
 		}
         $this->_cache     = JCache::getInstance('page', $options);
+		
+		
+		// echo'<pre>';print_r( $this->_cache );echo'</pre>'.__FILE__.' '.__LINE__;
 	}#END FN
     
     /**
@@ -108,17 +113,22 @@ class PlgSystemStarcache extends \JPlugin
      *
      * @since 3.8
      *
-     */ 
-    public function onBeforeCompileHead(){
+     */
+	public function onBeforeCompileHead ()
+	{
+		
+		
+		
+		if ( $this->app->isAdmin() ) return;
+		
+		$doc = JFactory::getDocument();
+		  scripts::_removeScripts($this , $doc );
+		
+		
+		
+	}#END FN
 	
-	   
-    	
-    	 if ( $this->app->isAdmin())  return;
-	  
-	    // $this->_removeScripts($doc);
-    
-        
-    }#END FN
+	
 	
 	
 	
@@ -126,8 +136,9 @@ class PlgSystemStarcache extends \JPlugin
     
     public function onAfterRender(){
 	
-	    $scripts = new \starcache\helpers\scripts();
+	    $scripts = new scripts();
 	   
+	    
     }#END FUN
 	
 	/**
@@ -146,30 +157,20 @@ class PlgSystemStarcache extends \JPlugin
 	    $mediaVersion = $this->params->get( 'mediaVersion', false );
 		
 		#Если включен режим ращработчика
-		#или mediaVersion - не установлкна
-		if ( ($user_view_param && !$mediaVersion ) ||  !$user_view_param     )
+		#или mediaVersion - не установлена == 0
+		// TODO  ( !$user_view_param  && 1 ) - 1 == Admin IP Address  in array this params
+		if ( ($user_view_param && !$mediaVersion ) || ( !$user_view_param  && 1 )     )
 		{
-			
-			$mediaVersion = JUserHelper::genRandomPassword( $length = 16 );
-			$this->params->set('mediaVersion' , $mediaVersion );
-			
-			if ( !class_exists( 'Core\zazCore' ) )  require JPATH_LIBRARIES . '/zaz/Core/zazCore.php';
-			
-			$extensions= new \Core\extensions\zazExtensions();
-			$PluginId = $extensions->getJoomlaPluginId($this) ;
-			$extensions->updateExtensionParams ( $this->params->toString() , $PluginId ) ;
+			#Обновить в параметрах пллагина  MediaVersion
+			$mediaVersion = scripts::updateMediaVersion($this);
 		
-		} #END IF
+		}#END IF
+		
 		#Установить ID Медиа версии
 		$doc->setMediaVersion( $mediaVersion );
         
- 
-        
-        
-        
-        
-        
-        
+		
+		
         # config class ukcpuDocument
         $ukcpuDoc_options = array (
         
@@ -212,6 +213,9 @@ class PlgSystemStarcache extends \JPlugin
     
     }#END FN
     
+	
+	
+	
     
 	
 	
@@ -239,10 +243,10 @@ class PlgSystemStarcache extends \JPlugin
             $parts[] = $jinput->cookie->get('cookieNotice', null, 'bool');
             
 			$key = md5(serialize($parts));
-		}
+		}#END IF
 
 		return $key;
-	}
+	}#END FN
 	
 	
 	/**
@@ -257,25 +261,17 @@ class PlgSystemStarcache extends \JPlugin
 	{
 		$app  = $this->app;
         $user = JFactory::getUser();
-
-        
-        
-        
-		// Кеш отключен в настройках плагина
+		
+        // Кеш отключен в настройках плагина
         if (  !$this->params->get('cache_on', false) ){
            return;
         }#END IF
 		
-		
-		
-		
-        if ($app->isClient('administrator'))
+		if ($app->isClient('administrator'))
 		{
 			return;
 		}
 		
-		
-  
 		if (count($app->getMessageQueue()))
 		{
 			return;
