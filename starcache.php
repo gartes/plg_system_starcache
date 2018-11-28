@@ -130,7 +130,12 @@ class PlgSystemStarcache extends \JPlugin
 	   
     }#END FUN
 	
-	
+	/**
+	 * @throws Exception
+	 * @author    Gartes
+	 * @since     3.8
+	 * @copyright 28.11.18
+	 */
 	public function onAfterRoute(){
 		
         $doc = JFactory::getDocument();
