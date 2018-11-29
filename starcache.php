@@ -133,6 +133,7 @@ class PlgSystemStarcache extends \JPlugin
 	
 	
 	
+	
     
     public function onAfterRender(){
 	
