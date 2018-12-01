@@ -119,6 +119,7 @@ class PlgSystemStarcache extends \JPlugin
 		
 		
 		
+		
 		if ( $this->app->isAdmin() ) return;
 		
 		$doc = JFactory::getDocument();
