@@ -69,8 +69,9 @@ class PlgSystemStarcache extends \JPlugin
 	protected $app;
 	
 	
-	public $_scripts = array();
+	public $_scripts = [];
 	public $_script = '';
+	public $_ScrptInBody = [];
 	public $_mediaVersion;
 	
 	
@@ -116,32 +117,72 @@ class PlgSystemStarcache extends \JPlugin
      */
 	public function onBeforeCompileHead ()
 	{
-		
-		
-		
-		
 		if ( $this->app->isAdmin() ) return;
 		
 		$doc = JFactory::getDocument();
-		  scripts::_removeScripts($this , $doc );
 		
+		# Перенос скриптов вниз
+		if ($this->params->get( 'downJsScript', false ) ){
+			# вырезать все Scripts - Записать  в $this->_scripts
+			scripts::_removeScripts( $this, $doc );
+		}#END IF
+		
+		# Переносить Декларации JS вниз
+		if ($this->params->get('downJsDeclarations', false))
+		{
+			$this->_script = $doc->_script['text/javascript'];
+			unset($doc->_script['text/javascript']);
+		}#END IF
 		
 		
 	}#END FN
 	
 	
-	
-	
-	
-	
-	
-    
+	/**
+	 * После создания тела страницы
+	 *
+	 * @throws Exception
+	 * @author    Gartes
+	 *
+	 * @since     3.8
+	 * @copyright 01.12.18
+	 */
     public function onAfterRender(){
-	
-	    $scripts = new scripts();
-	   
+		if (JFactory::getApplication()->isAdmin()){	return;  }
+		
+		$downJsDeclarations = $this->params->get( 'downJsDeclarations', false ) ;
+		$downJsSherchBody = $this->params->get( 'downJsSherchBody', false ) ;
+		
+		# Перенос тегов <script /> из тела старницы в низ
+	    # Вырезать и сохранить в переменной public $_ScrptInBody
+	    if ( $downJsDeclarations &&  $downJsSherchBody )
+	    {
+		     scripts::_excludeScriptInBody($this);
+	    }#END IF
+		
+		# Если есть скрипты для переноса
+	    if (count($this->_scripts))
+	    {
+		    scripts::_moveScripts($this);
+	    }#END IF
 	    
-    }#END FUN
+	    
+	    
+	    # Если установлено переносить декларативы из HEAD вниз страницы
+	    if ( $downJsDeclarations )
+	    {
+		   scripts::_moveScript($this);
+		    if ( $downJsSherchBody )
+		    {
+			    scripts::_includeScriptInBody($this);
+				   
+		    }#END IF
+	    }#END IF
+	
+	    
+	    
+	    
+    }#END FN
 	
 	/**
 	 * @throws Exception

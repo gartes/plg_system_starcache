@@ -25,7 +25,9 @@
 	<config>
 		<fields name="params">
             <fieldset name="UKCPU_Lib">
-                <field
+
+				<!-- Режим USER -->
+				<field
 					name="ukcpu_lib_view"
 					type="radio"
 					label="PLG_CACHE_UKCPU_LIB_VIEW_LABEL"
@@ -36,7 +38,8 @@
 					<option value="1">JYES</option>
 					<option value="0">JNO</option>
 				</field>
-                
+
+                <!-- ID Медиа версии -->
                 <field
 					name="mediaVersion"
 					type="text"
@@ -44,7 +47,48 @@
 					default="" >
 					 
 				</field>
-                
+
+				<!-- Опустить ссылки Js вниз страницы -->
+				<field
+						name="downJsScript"
+						type="radio"
+						label="PLG_STARCACHE_DOWN_JS_SCRIPT_LABEL"
+
+						class="btn-group btn-group-yesno"
+						default="0"
+				>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+
+
+				<!-- Опустить декларативы Js вниз страницы -->
+				 <!-- showon="downJsScript:1" -->
+				<field
+						name="downJsDeclarations"
+						type="radio"
+						label="PLG_STARCACHE_DOWN_JS_DECLARATIONS_LABEL"
+
+						class="btn-group btn-group-yesno"
+						default="0"
+				>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+
+				<!-- Искать теги <script> в теле страницы -->
+				<field
+						name="downJsSherchBody"
+						type="radio"
+						label="PLG_STARCACHE_DOWN_JS_SHERCH_BODY_LABEL"
+						showon="downJsDeclarations:1"
+						class="btn-group btn-group-yesno"
+						default="1"
+				>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+
                 
             </fieldset>
 			<fieldset name="basic">
