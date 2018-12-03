@@ -9,6 +9,7 @@
  */
 	
 	use starcache\helpers\scripts;
+	use starcache\helpers\css;
 	
 	defined('_JEXEC') or die('Restricted access');
 jimport('joomla.plugin.plugin');
@@ -135,6 +136,10 @@ class PlgSystemStarcache extends \JPlugin
 		}#END IF
 		
 		
+		$css = new css();
+		$CriticalCss = $css::getCriticalCss();
+		
+		
 	}#END FN
 	
 	
@@ -179,6 +184,7 @@ class PlgSystemStarcache extends \JPlugin
 		    }#END IF
 	    }#END IF
 	
+	    
 	    
 	    
 	    
