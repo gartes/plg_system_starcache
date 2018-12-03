@@ -24,17 +24,39 @@
 		public function __construct ()
 		{
 			
-			echo'<pre>';print_r( $this );echo'</pre>'.__FILE__.' '.__LINE__;
+		
 			
 		}#END FN
 		
 		
-		public static function getCriticalCss(){
+		public static function getAllCss(){
 			
 			if ( !class_exists( 'Optimize\zazOptimize' ) ) require JPATH_LIBRARIES . '/zaz/Optimize/zazOptimize.php';
 			$css = new \Optimize\css\cssOptimize();
-			$css->getCriticalCss();
+			return $css->getAllCss();
 		
 		}#END FN
+		
+		
+		public static function getCriticalCss(   $allCss ){
+			
+			$app = \JFactory::getApplication() ;
+			
+			
+			
+			$bodyHtml  = $app->getBody() ;
+			
+			if ( !class_exists( 'Optimize\zazOptimize' ) ) require JPATH_LIBRARIES . '/zaz/Optimize/zazOptimize.php';
+			$css = new \Optimize\css\cssOptimize();
+			$CriticalCss = $css->getCriticalCss($bodyHtml , $allCss);
+			
+			$bodyHtml = str_replace( '</head>' , '<style>'.$CriticalCss['criticalcss'].'</style></head>' , $bodyHtml) ;
+			
+			$app->setBody($bodyHtml) ;
+			
+		// 	echo'<pre>';print_r( $CriticalCss );echo'</pre>'.__FILE__.' '.__LINE__;
+			
+		}#END FN
+		
 		
 	}#END CLASS

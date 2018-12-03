@@ -76,6 +76,9 @@ class PlgSystemStarcache extends \JPlugin
 	public $_mediaVersion;
 	
 	
+	public $AllCss ;
+	
+	
 	/**
 	 *  * Constructor.
 	 *
@@ -135,12 +138,16 @@ class PlgSystemStarcache extends \JPlugin
 			unset($doc->_script['text/javascript']);
 		}#END IF
 		
+		# Получить все CSS сытраницы
+		// $css = new css();
 		
-		$css = new css();
-		$CriticalCss = $css::getCriticalCss();
+		$this->AllCss = starcache\helpers\css::getAllCss();
+		
 		
 		
 	}#END FN
+	
+	
 	
 	
 	/**
@@ -184,7 +191,11 @@ class PlgSystemStarcache extends \JPlugin
 		    }#END IF
 	    }#END IF
 	
+	    # Установить критические стили
+	    starcache\helpers\css::getCriticalCss(   $this->AllCss );
 	    
+	    
+	
 	    
 	    
 	    
