@@ -38,6 +38,7 @@
 		}#END FN
 		
 		
+		
 		public static function getCriticalCss(   $allCss ){
 			
 			$app = \JFactory::getApplication() ;
@@ -56,6 +57,24 @@
 			
 		// 	echo'<pre>';print_r( $CriticalCss );echo'</pre>'.__FILE__.' '.__LINE__;
 			
+		}#END FN
+		
+		
+		/**
+		 * Создание отложенной загрузки для CSS файлов
+		 *
+		 * @param $doc
+		 *
+		 * @author    Gartes
+		 *
+		 * @since     3.8
+		 * @copyright 04.12.18
+		 */
+		public static function downCss ( $doc )
+		{
+			$css = new \Optimize\css\cssOptimize();
+			$css->addLazyLoadingCss( $doc->_styleSheets );
+			$doc->_styleSheets = [];
 		}#END FN
 		
 		

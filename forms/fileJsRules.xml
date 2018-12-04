@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+    <fieldset name="section1" label="Section1">
+
+        <!-- Url Файла -->
+        <field name="file" type="text" label="PLG_STARCACHE_JS_REULES_FILE" size="50"/>
+        <!-- Загружать -->
+        <field name="load" type="checkbox" checked="0" label="PLG_STARCACHE_JS_REULES_LOAD" description="" value="1" />
+
+        <!-- override -->
+        <field name="override" type="radio" default="0" label="OVERRIDE" description="" class="btn-group btn-group-yesno">
+            <option value="1">JYES</option>
+            <option value="0">JNO</option>
+        </field>
+
+        <!-- Новый файл -->
+        <field name="overrideFile" showon="override:1" type="text" label="PLG_STARCACHE_JS_OVERRIDE_FILE_FILE" size="50"/>
+
+        <!-- PRELOAD  -->
+        <field name="preload" type="radio"
+               default="0"
+               label="PRELOAD"
+               showon="defer:0[AND]async:0"
+               description="" class="btn-group btn-group-yesno">
+            <option value="1">JYES</option>
+            <option value="0">JNO</option>
+        </field>
+        <!-- DEFER  -->
+        <field name="defer" type="radio"
+               default="0"
+               showon="preload:0"
+               label="DEFER"
+               description="" class="btn-group btn-group-yesno">
+            <option value="1">JYES</option>
+            <option value="0">JNO</option>
+        </field>
+        <!-- ASYNC -->
+        <field name="async" type="radio"
+               showon="preload:0"
+               default="0" label="ASYNC" description="" class="btn-group btn-group-yesno">
+            <option value="1">JYES</option>
+            <option value="0">JNO</option>
+        </field>
+
+
+
+    </fieldset>
+   <!-- <fieldset name="section2" label="Section2">
+        <field name="example_list"
+               type="list"
+               multiple="true"
+               default=""
+               class="advancedSelect"
+               label="Example List">
+            <option value="One">One</option>
+            <option value="Two">Two</option>
+            <option value="three">three</option>
+            <option value="four">four</option>
+            <option value="five">five</option>
+        </field>
+    </fieldset>-->
+</form>

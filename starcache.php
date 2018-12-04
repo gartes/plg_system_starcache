@@ -10,6 +10,7 @@
 	
 	use starcache\helpers\scripts;
 	use starcache\helpers\css;
+	use starcache\helpers\admin;
 	
 	defined('_JEXEC') or die('Restricted access');
 jimport('joomla.plugin.plugin');
@@ -121,15 +122,38 @@ class PlgSystemStarcache extends \JPlugin
      */
 	public function onBeforeCompileHead ()
 	{
-		if ( $this->app->isAdmin() ) return;
+		
+		
+		if ( $this->app->isAdmin() ) {
+			admin::addJS();
+			
+			return;
+		}
 		
 		$doc = JFactory::getDocument();
 		
+		# CSS Оптимизация
+		  $this->AllCss =  css::getAllCss();
+		 css::downCss( $doc );
+		
+		# Поддержка Virtuemart
+		if ($this->params->get('supportVirtuemart' , false)){
+			vmJsApi::writeJS();
+		}
+		
+		
 		# Перенос скриптов вниз
-		if ($this->params->get( 'downJsScript', false ) ){
+		if ( $this->params->get( 'downJsScript', false ) ){
 			# вырезать все Scripts - Записать  в $this->_scripts
 			scripts::_removeScripts( $this, $doc );
 		}#END IF
+		
+		
+		
+		//		defer
+		// $this->_scripts['/media/jui/js/bootstrap.min.js']['defer'] = 1 ;
+		
+	   //echo'<pre>';print_r( $this->_scripts );echo'</pre>'.__FILE__.' '.__LINE__;
 		
 		# Переносить Декларации JS вниз
 		if ($this->params->get('downJsDeclarations', false))
@@ -138,10 +162,8 @@ class PlgSystemStarcache extends \JPlugin
 			unset($doc->_script['text/javascript']);
 		}#END IF
 		
-		# Получить все CSS сытраницы
-		// $css = new css();
 		
-		$this->AllCss = starcache\helpers\css::getAllCss();
+		
 		
 		
 		
@@ -171,13 +193,17 @@ class PlgSystemStarcache extends \JPlugin
 	    {
 		     scripts::_excludeScriptInBody($this);
 	    }#END IF
-		
+	
+	   
+	    
 		# Если есть скрипты для переноса
+	    # опустить скрипты вниз
 	    if (count($this->_scripts))
 	    {
-		    scripts::_moveScripts($this);
+		   scripts::_moveScripts($this);
 	    }#END IF
-	    
+	
+	
 	    
 	    
 	    # Если установлено переносить декларативы из HEAD вниз страницы
@@ -186,13 +212,13 @@ class PlgSystemStarcache extends \JPlugin
 		   scripts::_moveScript($this);
 		    if ( $downJsSherchBody )
 		    {
-			    scripts::_includeScriptInBody($this);
+			   scripts::_includeScriptInBody($this);
 				   
 		    }#END IF
 	    }#END IF
-	
+	 
 	    # Установить критические стили
-	    starcache\helpers\css::getCriticalCss(   $this->AllCss );
+	     starcache\helpers\css::getCriticalCss(   $this->AllCss );
 	    
 	    
 	

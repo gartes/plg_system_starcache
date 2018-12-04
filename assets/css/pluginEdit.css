@@ -1,0 +1,51 @@
+[data-base-name="fileJsRules"] input[type=text]{
+    width: auto;
+}
+[data-base-name="fileJsRules"]{}
+[data-base-name="fileJsRules"]{}
+[data-base-name="fileJsRules"]{}
+[data-base-name="fileJsRules"]{}
+[data-base-name="fileJsRules"]{}
+[data-base-name="fileJsRules"]{}
+.subform-repeatable-group[data-base-name="fileJsRules"] .btn-toolbar a{
+    float: left;
+    display: block;
+    top: 0;
+}
+.subform-repeatable-group[data-base-name="fileJsRules"] .btn-toolbar a.group-remove{/* top: 0px; */}
+.subform-repeatable-group[data-base-name="fileJsRules"] .btn-toolbar a.group-add{
+    top: 30px;
+    height: 26px;
+    border: 1px solid #ccc;
+}
+
+.subform-repeatable-group[data-base-name="fileJsRules"] .control-group{
+    float: left;
+    width: 100%;
+    height: 33px;
+    margin: 0 0 5px;
+}
+
+.subform-repeatable-group[data-base-name="fileJsRules"] .control-group:nth-child(2) {
+    width: 50%;
+}
+
+.subform-repeatable-group[data-base-name="fileJsRules"] .control-group:nth-child(3) {
+    width: 50%;
+}
+
+.subform-repeatable-group[data-base-name="fileJsRules"] .control-label {
+    width: 60px;
+}
+
+.subform-repeatable-group[data-base-name="fileJsRules"] .control-label label {
+    font-size: 10px !important;
+}
+
+.subform-repeatable-group[data-base-name="fileJsRules"] .controls {
+    margin: 0 0 0 49px;
+}
+
+.subform-repeatable-group[data-base-name="fileJsRules"] {
+    float: left;
+}

@@ -75,6 +75,9 @@
 		public static function _removeScripts ( \PlgSystemStarcache &$Starcache , $doc )
 		{
 			$regex        = self::_prepExclude( (array) $Starcache->params->get( 'scripts', [] ) );
+			$rules = self::_prepareRules($Starcache->params->get('fileJsRules') , array() );
+			
+			
 			$matched      = [];
 			$regexinclude = $Starcache->params->get( 'include', false );
 			
@@ -86,8 +89,47 @@
 				
 			}#END FOREACH
 			
+			
+			
 			foreach ( $doc->_scripts as $src => $attribs )
 			{
+				
+				# Если есть в правилах загрузки
+				if (isset($rules[$src])){
+					
+					# Если отмечено не загружать
+					if ( !isset($rules[$src]->load)) {
+						unset( $doc->_scripts[ $src ] );
+						continue;
+					}#END IF
+					
+					$attribs = array_merge( $attribs , (array)$rules[$src] );
+					
+					# Если замена файла
+					if ( $rules[$src]->overrideFile ){
+						$newSrc = $rules[$src]->overrideFile ;
+						
+						$Starcache->_scripts[ $newSrc ] = $attribs;
+						unset( $doc->_scripts[ $src ] );
+						
+						self::_createPreloadTag( $newSrc , $attribs , $doc);
+						
+						continue;
+					
+					}#END IF
+					
+					self::_createPreloadTag( $src , $attribs , $doc);
+					
+					
+					/*echo'<pre>';print_r(  $rules[$src] );echo'</pre>'.__FILE__.' '.__LINE__;
+					echo'<pre>';print_r( $src );echo'</pre>'.__FILE__.' '.__LINE__;
+					echo'<pre>';print_r( $attribs );echo'</pre>'.__FILE__.' '.__LINE__;*/
+					
+				}#END IF
+				
+				
+				
+				
 				
 				if ( !$regexinclude )
 				{
@@ -114,9 +156,41 @@
 				
 			}#END FOREACH
 			
+			// xzlib.js
+			//    echo'<pre>';print_r( $Starcache->_scripts );echo'</pre>'.__FILE__.' '.__LINE__;
 			
+		}#END FUN
+		
+		private static function _createPreloadTag( $src , $attribs , $doc ){
+			if ( !$attribs['preload']) return ;
+			$tag = '<link rel="preload" href="'.$src.'" as="script">';
+			$doc->addCustomTag( $tag );
+		}#END FUN
+		
+		
+		/**
+		 * Подготовка правил загрузки JS Файлов из настроек плагина 
+		 * @param $reules
+		 *
+		 * @return array
+		 * @author    Gartes
+		 *
+		 * @since     3.8
+		 * @copyright 04.12.18
+		 */
+		private static function _prepareRules ( $reules )
+		{
 			
+			$ret = [];
+			foreach ( $reules as $r )
+			{
+				$ret[ $r->file ] = $r;
+				
+				
+				
+			}#END FOREACH
 			
+			return $ret;
 		}#END FUN
 		
 		
@@ -199,6 +273,7 @@
 			$scriptStr = '';
 			
 			
+			
 			foreach ($Starcache->_ScrptInBody as  $scriptTag){
 				// TODO Add script compress
 				$scriptStr .= $scriptTag ;
@@ -244,7 +319,10 @@
 		 * @since     3.8
 		 * @copyright 01.12.18
 		 */
-		private static function _renderScript( $Starcache ,  $src = false, $attribs) {
+		private static function _renderScript( $Starcache ,  $src = false, $attribs = [] ) {
+			
+//			echo'<pre>';print_r( $src );echo'</pre>'.__FILE__.' '.__LINE__;
+//			echo'<pre>';print_r( $attribs );echo'</pre>'.__FILE__.' '.__LINE__;
 			
 			$defaultJsMimes = array('text/javascript', 'application/javascript', 'text/x-javascript', 'application/x-javascript');
 			$doc = JFactory::getDocument();
@@ -257,13 +335,6 @@
 				
 			$dom = new DOMDocument('1.0', 'UTF-8');
 			$script = $dom->createElement('script');
-			
-			
-			
-			
-			
-			
-			
 			
 			# add src attribute
 			if ($src)

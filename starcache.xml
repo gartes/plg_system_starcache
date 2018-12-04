@@ -89,8 +89,26 @@
 					<option value="0">JNO</option>
 				</field>
 
-                
-            </fieldset>
+				<!-- Поддержка Virtuemart  -->
+				<field
+						name="supportVirtuemart"
+						type="radio"
+						label="PLG_STARCACHE_DOWN_JS_SUPPORT_VIRTUEMART_LABEL"
+
+						class="btn-group btn-group-yesno"
+						default="0"
+				>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+
+				<field name="fileJsRules" type="subform" multiple="true"
+
+					   formsource="plugins/system/starcache/forms/fileJsRules.xml"
+					   label="Subform Field" description="Subform Field Description" />
+
+
+			</fieldset>
 			<fieldset name="basic">
 				
                 <field
