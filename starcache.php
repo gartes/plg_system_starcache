@@ -170,6 +170,11 @@ class PlgSystemStarcache extends \JPlugin
 			
 			$app->close();
 		}#END IF
+		
+		
+		
+		
+		
 	}#END FN
 	
 	/**
@@ -200,7 +205,7 @@ class PlgSystemStarcache extends \JPlugin
 		
 		#Установить ID Медиа версии
 		$doc->setMediaVersion( $mediaVersion );
-	
+		defined('VM_JS_VER') or define('VM_JS_VER', $mediaVersion);
 	}#END FN
 	
     /**

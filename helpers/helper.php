@@ -51,6 +51,57 @@
 		}#END FN
 		
 		
+		public static function _mergeRules ( $docData, $rules )
+		{
+			
+			$doc = JFactory::getDocument();
+			$MediaVersion = $doc->getMediaVersion();
+			$retArr = [];
+			foreach ($docData as $url => $paramData ){
+				
+				$url  =  str_replace('?vmver='.VM_JS_VER , '' ,  $url );
+				
+				# Если настройки для файла присутствуют
+				if ( is_array( $rules ) && array_key_exists( $url , $rules) ) {
+					
+					
+					$_MediaVersionLocal = (isset($rules[$url]->options->version)? $rules[$url]->options->version : false ) ;
+					
+					if (!isset($rules[$url]->options->verType)) $rules[$url]->options->verType = false ;
+					
+					$newUrl = $url;
+					
+					/*echo'<pre>';print_r( $url );echo'</pre>'.__FILE__.' '.__LINE__;
+					echo'<pre>';print_r( $rules[$url] );echo'</pre>'.__FILE__.' '.__LINE__;*/
+					
+					$rules[$url]->options->detectDebug = (isset($rules[$url]->options->detectDebug) ? $rules[$url]->options->detectDebug : false ) ;
+					
+					
+					if (  !$rules[$url]->options->detectDebug){
+						$newUrl = $url.'?_='.( $rules[$url]->options->verType && !empty($_MediaVersionLocal) ? $_MediaVersionLocal : $MediaVersion );
+					}
+					
+					
+					$retArr[$newUrl] = (object)array_merge((array)$paramData, (array)$rules[$url] );
+					
+					
+					
+				}else{
+					
+					$retArr[$url] = (object)$paramData ;
+				}#END IF
+				
+				
+				
+				
+			}#END FOREACH
+			
+			return $retArr ;
+			
+		}#END FN
+
+		
+		
 		/**
 		 * Подготовка правил загрузки JS Файлов из настроек плагина
 		 *
@@ -69,7 +120,7 @@
 			
 			$ret = [];
 			
-			
+		 
 			
 			if ( empty($rules) || count($rules)==0 ) return false ;
 			

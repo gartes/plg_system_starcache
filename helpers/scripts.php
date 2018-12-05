@@ -65,19 +65,24 @@
 		 * @since     3.8
 		 * @copyright 27.11.18
 		 *
+		 * @throws \Exception
 		 */
+		
+		 
+		
 		public static function _removeScripts ( \PlgSystemStarcache &$Starcache , $doc )
 		{
 			$regex        = self::_prepExclude( (array) $Starcache->params->get( 'scripts', [] ) );
 			
-			$rules = \starcache\helpers\helper::_prepareRules( $Starcache->params->get('fileJsRules')     );
+			$jsRules = $Starcache->params->get('jsSetting') ;
+			$rules = \starcache\helpers\helper::_prepareRules(  $jsRules->filejsRules   );
 		 
+			 
+			
+			
 			
 			$matched      = [];
 			$regexinclude = $Starcache->params->get( 'include', false );
-			
-			
-			
 			foreach ( $regex as $r )
 			{
 				
@@ -87,78 +92,113 @@
 			}#END FOREACH
 			
 			
+			$_scripts = [];
+			$_ind = count($rules);
+			$_saveData = new \stdClass();
 			
 			foreach ( $doc->_scripts as $src => $attribs )
 			{
+				$oldUrl = $src ;
+				//$src =  str_replace('?vmver='.VM_JS_VER , '' ,  $src );
+				$src = preg_replace("/(\?vmver=.*)/", "", $src);
+				// echo'<pre>';print_r( $src );echo'</pre>'.__FILE__.' '.__LINE__;
 				
+				
+				
+				// echo'<pre>';print_r( $rules );echo'</pre>'.__FILE__.' '.__LINE__;
 				# Если есть в правилах загрузки
-				if (isset($rules[$src])){
-					
-					
-					
+				if ( isset( $rules[ $src ] ) )
+				{
 					# Если отмечено не загружать
-					if ( !$rules[$src]->load ) {
-						unset( $doc->_scripts[ $src ] );
-						continue;
-					}#END IF
-					
-					$attribs = array_merge( $attribs , (array)$rules[$src] );
-					
-					# Если замена файла
-					if ( $rules[$src]->overrideFile ){
-						$newSrc = $rules[$src]->overrideFile ;
-						
-						$Starcache->_scripts[ $newSrc ] = $attribs;
-						unset( $doc->_scripts[ $src ] );
-						
-						self::_createPreloadTag( $newSrc , $attribs , $doc);
-						
-						continue;
-					
-					}#END IF
-					
-					self::_createPreloadTag( $src , $attribs , $doc);
-					
-					
-					/*echo'<pre>';print_r(  $rules[$src] );echo'</pre>'.__FILE__.' '.__LINE__;
-					echo'<pre>';print_r( $src );echo'</pre>'.__FILE__.' '.__LINE__;
-					echo'<pre>';print_r( $attribs );echo'</pre>'.__FILE__.' '.__LINE__;*/
-					
-				}#END IF
-				
-				
-				
-				
-				
-				if ( !$regexinclude )
-				{
-					if ( !in_array( $src, $matched ) )
+					if ( isset($rules[ $src ]->load) && !$rules[ $src ]->load )
 					{
-						$Starcache->_scripts[ $src ] = $attribs;
-						unset( $doc->_scripts[ $src ] );
+						//	unset( $doc->_scripts[ $oldUrl ] );
+						continue;
 					}#END IF
+					
+					$u = $src ;
+					if ( isset($rules[ $src ]->override) && $rules[ $src ]->override ){
+						$u = $rules[ $src ]->overrideFile ;
+					}#END IF
+					
+					$_scripts[ $u ] = new \stdClass();
+					$_scripts[ $u ] = (object)array_merge( (array)$attribs, (array)$rules[ $src ] );
+					$_scripts[ $u ]->options = (object)array_merge( (array)$attribs['options'] , (array)$rules[ $src ]->options );
+					
+					self::_createPreloadTag( $u , $_scripts[ $u ] , $doc );
+//					
 					continue;
-				}#END IF
-				
-				
-				
-				if ( in_array( $src, $matched ) )
-				{
+				}else{
+					$u = $src ;
+					$_scripts[ $u ] = new \stdClass();
+					$_scripts[ $u ] = (object) $attribs ;
+					$_scripts[ $u ]->options = (object)$attribs['options']   ;
+					$_scripts[ $u ]->file = $u   ;
 					
-					$attribs[ 'defer' ]              = 1;
-					$attribs[ 'options' ][ 'defer' ] = 1;
-					
-					$Starcache->_scripts[ $src ] = $attribs;
-					unset( $doc->_scripts[ $src ] );
-					
+					$t_ind = 'filejsRules'.$_ind ;
+					$_saveData->$t_ind = $_scripts[ $u ] ;
+					$_ind ++;
 				}#END IF
 				
 			}#END FOREACH
 			
-			// xzlib.js
-			//     echo'<pre>';print_r( $Starcache->_scripts );echo'</pre>'.__FILE__.' '.__LINE__;
+			
+			
+			
+			if ( !empty($jsRules->filejsRules)) {
+				$_saveData = (object)array_merge( (array)$jsRules->filejsRules, (array) $_saveData );
+			}#END IF
+			
+			
+//			echo'<pre>';print_r( $_saveData );echo'</pre>'.__FILE__.' '.__LINE__;
+			$doc->_scripts=[];
+			$Starcache->_scripts = $_scripts ;
+			# Сохранить параметры JS
+			self::saveJsParam ( $_saveData );
+			 
 			
 		}#END FUN
+		
+		/**
+		 * Сохранить в параметрах плагина
+		 *
+		 * @param $_saveData
+		 *
+		 * @throws \Exception
+		 * @author    Gartes
+		 *
+		 *
+		 *
+		 * @since     3.8
+		 * @copyright 05.12.18
+		 */
+		private static function saveJsParam ( $_saveData ){
+			
+			
+//			echo'<pre>';print_r( $_saveData );echo'</pre>'.__FILE__.' '.__LINE__;
+			
+			# Получить параметры плагина
+			$param = \Core\extensions\zazExtensions::getParamsPlugin('system' , 'starcache' ) ;
+			$jsSetting = $param->get('jsSetting' , false );
+			$jsSetting->filejsRules = $_saveData;
+			
+			$param->set('jsSetting' , $jsSetting );
+			
+			# Сохранить параметры
+			$Plg = new \stdClass();
+			$Plg->_name = 'starcache';
+			$Plg->_type = 'system';
+			$zazExtensions = new \Core\extensions\zazExtensions();
+			$PlgId = $zazExtensions->getJoomlaPluginId($Plg) ;
+			 $zazExtensions->updateExtensionParams( $param->toString() , $PlgId );
+			
+			
+			// echo'<pre>';print_r( $jsSetting );echo'</pre>'.__FILE__.' '.__LINE__;
+			
+			
+		}#END FUN
+		
+		
 		
 		/**
 		 * @param $src
@@ -171,7 +211,7 @@
 		 * @copyright 04.12.18
 		 */
 		private static function _createPreloadTag( $src , $attribs , $doc ){
-			if ( !$attribs['preload']) return ;
+			if ( !isset( $attribs->preload ) || !$attribs->preload ) return ;
 			$tag = '<link rel="preload" href="'.$src.'" as="script">';
 			$doc->addCustomTag( $tag );
 		}#END FUN
@@ -313,11 +353,15 @@
 			$defaultJsMimes = array('text/javascript', 'application/javascript', 'text/x-javascript', 'application/x-javascript');
 			$doc = JFactory::getDocument();
 			
+			
+//			echo'<pre>';print_r( $attribs );echo'</pre>'.__FILE__.' '.__LINE__;
+			
+			
 			$mediaVersion = (
-				isset($attribs['options']['version'])
+				isset($attribs->options->version )
 				&&
-				$attribs['options']['version']
-				&& strpos($src, '?') === false && ($Starcache->_mediaVersion || $attribs['options']['version'] !== 'auto')) ? $Starcache->_mediaVersion : '';
+				$attribs->options->version
+				&& strpos($src, '?_') === false && ( $Starcache->_mediaVersion || $attribs->options->version !== 'auto')) ? $Starcache->_mediaVersion : '';
 				
 			$dom = new DOMDocument('1.0', 'UTF-8');
 			$script = $dom->createElement('script');
@@ -328,7 +372,7 @@
 				self::_addAttribute($dom, $script, 'src', $src . $mediaVersion);
 			}
 			# add type attribute
-			if (array_intersect(array_keys($attribs), array('type', 'mime')) && !$doc->isHtml5() && in_array((isset($attribs['type']) ? $attribs['type'] : $attribs['mime']), $defaultJsMimes))
+			if (array_intersect(array_keys((array)$attribs), array('type', 'mime')) && !$doc->isHtml5() && in_array((isset($attribs->type ) ? $attribs->type : $attribs->mime ), $defaultJsMimes))
 			{
 				self::_addAttribute($dom, $script, 'type', isset($attribs['type'])?$attribs['type']:$attribs['mime']);
 			}
@@ -343,7 +387,7 @@
 		
 		
 			# add defer attribute
-			if (isset($attribs['defer']) && $attribs['defer'] == true)
+			if (isset($attribs->defer ) && $attribs->defer  == true)
 			{
 				self::_addAttribute($dom, $script, 'defer');
 			}
@@ -352,7 +396,7 @@
 			
 			
 			# add async attribute
-			if (isset($attribs['async']) && $attribs['async'] == true)
+			if (isset($attribs->async ) && $attribs->async  == true)
 			{
 				self::_addAttribute($dom, $script, 'asnyc');
 			}
@@ -360,16 +404,16 @@
 			
 			
 			# add charset attribute
-			if (isset($attribs['charset']))
+			if (isset($attribs->charset ))
 			{
-				self::_addAttribute($dom, $script, 'charset', $attribs['charset']);
+				self::_addAttribute($dom, $script, 'charset', $attribs->charset );
 			}
 			$dom->appendChild($script);
 			
-			if (isset($attribs['options']) && isset($attribs['options']['conditional']))
+			if (isset($attribs->options ) && isset( $attribs->options->conditional ))
 			{
 				$tag = $dom->saveHTML();
-				return implode("\n", array('<!--[if ' . $attribs['options']['conditional'] . ']>', $tag . '<![endif]-->', ''));
+				return implode("\n", array('<!--[if ' . $attribs->options->conditional . ']>', $tag . '<![endif]-->', ''));
 			}
 			return $dom->saveHTML();
 		}#END FN

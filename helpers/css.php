@@ -89,9 +89,16 @@
 			}
 			
 			
+			$rules = \starcache\helpers\helper::_prepareRules(  $cssParams->fileCssRules    );
+			$doc->_styleSheets = \starcache\helpers\helper::_mergeRules(  $doc->_styleSheets , $rules   );
+			
+			
+			
+			
+			//echo'<pre>';print_r( $doc->_styleSheets  );echo'</pre>'.__FILE__.' '.__LINE__;
+			
+			
 			$css = new \Optimize\css\cssOptimize();
-			
-			
 			
 			
 			// =>['historyOn'=>'BOOL']
@@ -99,10 +106,16 @@
 			$doc->_styleSheets = [];
 		}#END FN
 		
+		
+		
+		
+		
+		
 		/**
 		 * @param $styleSheets
 		 * @param $fileCssRules
 		 *
+		 * @return object|\stdClass
 		 * @throws \Exception
 		 * @author    Gartes
 		 *
@@ -114,35 +127,27 @@
 			if (empty ( $fileCssRules ) ) $fileCssRules = array();
 			$rules = \starcache\helpers\helper::_prepareRules(  $fileCssRules    );
 			
-			
-			
-			
 			$ind = count($fileCssRules) ;
-			
 			
 			$Buffer = new \stdClass() ;
 			foreach ($styleSheets as $url => $opt ) {
-				if ( is_array($rules) && array_key_exists($url, $rules) ) {
+				
+				
+				$copyUrl =  str_replace('?vmver='.VM_JS_VER , '' ,  $url );
+				
+				
+				# Если настройки для файла присутствуют
+				if ( is_array($rules) && array_key_exists( $copyUrl , $rules) ) {
 					
-					
-					
-					/*echo'<pre>';print_r( $opt );echo'</pre>'.__FILE__.' '.__LINE__;
-					echo'<pre>';print_r(  $rules[$url] );echo'</pre>'.__FILE__.' '.__LINE__;*/
-					
-					
-				 /*
-					
-					$rules[$url]->options =  (array)$rules[$url]->options;
-					$styleSheets[$url] = (array)$rules[$url] ;
-					*/
 					
 				}else{
 				 
 					$data = new \stdClass();
-					$data->file = $url ;
+					$data->file = $copyUrl ;
 					$data->load = 1 ;
 					
 					$data->options = (object)$opt['options']  ;
+					$data->options->detectDebug = (isset($data->options->detectDebug)?$data->options->detectDebug:false) ;
 					unset($opt['options'] ) ;
 					
 					$data = (object)array_merge((array)$data, (array)$opt);
@@ -155,22 +160,19 @@
 			
 			$Buffer = (object)array_merge((array)$fileCssRules, (array)$Buffer );
 			
-			echo'<pre>';print_r( $fileCssRules );echo'</pre>'.__FILE__.' '.__LINE__;
-			echo'<pre>';print_r( $Buffer );echo'</pre>'.__FILE__.' '.__LINE__;
 			
 			
 			
-		 
-			
-			
+			# Получить параметры плагина
 			$param = \Core\extensions\zazExtensions::getParamsPlugin('system' , 'starcache' ) ;
+			
 			
 			
 			$cssSetting = $param->get('cssSetting');
 			$cssSetting->fileCssRules = $Buffer ;
 			$param->set('cssSetting' , $cssSetting );
 			
-			
+			 
 			# Сохранить параметры
 			$Plg = new \stdClass();
 			$Plg->_name = 'starcache';
@@ -181,7 +183,7 @@
 			
 			
 			
-			
+			return $Buffer ;
 			
 		}#END FN
 		

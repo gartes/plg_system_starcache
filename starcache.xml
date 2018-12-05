@@ -148,6 +148,31 @@
 
 			</fieldset>
 
+			<fieldset name="js">
+				<fields name="jsSetting">
+					<field
+							name="historyOn"
+							type="radio"
+							label="PLG_CACHE_CSS_SETTING_HISTORY_ON_LABEL"
+							description="PLG_CACHE_CSS_SETTING_HISTORY_ON_DESC"
+							class="btn-group btn-group-yesno"
+							default="0"
+					>
+						<option value="1">JYES</option>
+						<option value="0">JNO</option>
+					</field>
+
+					<field name="filejsRules"
+						   type="subform"
+						   multiple="true"
+						   formsource="plugins/system/starcache/forms/jsSetting.xml"
+						   label="Subform Field"
+						   description="Subform Field Description" />
+
+
+				</fields>
+			</fieldset>
+
 			<fieldset name="css">
 				<fields name="cssSetting">
 					<field
@@ -162,14 +187,16 @@
 						<option value="0">JNO</option>
 					</field>
 
+
+
 					<field name="fileCssRules"
 						   type="subform"
 						   multiple="true"
 						   formsource="plugins/system/starcache/forms/cssSetting.xml"
 						   label="Subform Field"
 						   description="Subform Field Description" />
-				</fields>
 
+				</fields>
 
 			</fieldset>
 
