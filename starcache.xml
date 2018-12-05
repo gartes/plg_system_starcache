@@ -11,6 +11,8 @@
 	<description>PLG_CACHE_XML_DESCRIPTION</description>
 
 	<files>
+		<folder>assets</folder>
+		<folder>forms</folder>
 		<folder>helpers</folder>
 		<folder>language</folder>
 		<folder>vendor</folder>
@@ -145,6 +147,34 @@
 				/>
 
 			</fieldset>
+
+			<fieldset name="css">
+				<fields name="cssSetting">
+					<field
+							name="historyOn"
+							type="radio"
+							label="PLG_CACHE_CSS_SETTING_HISTORY_ON_LABEL"
+							description="PLG_CACHE_CSS_SETTING_HISTORY_ON_DESC"
+							class="btn-group btn-group-yesno"
+							default="0"
+					>
+						<option value="1">JYES</option>
+						<option value="0">JNO</option>
+					</field>
+
+					<field name="fileCssRules"
+						   type="subform"
+						   multiple="true"
+						   formsource="plugins/system/starcache/forms/cssSetting.xml"
+						   label="Subform Field"
+						   description="Subform Field Description" />
+				</fields>
+
+
+			</fieldset>
+
+
+
 			<fieldset name="advanced">
 				<field
 					name="exclude"

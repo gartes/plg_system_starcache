@@ -1,5 +1,8 @@
-[data-base-name="fileJsRules"] input[type=text]{
-    width: auto;
+[data-base-name="fileCssRules"]{}
+
+[data-base-name="fileJsRules"] input[type=text], 
+[data-base-name="fileCssRules"] input[type=text]{
+    width: auto; 
 }
 [data-base-name="fileJsRules"]{}
 [data-base-name="fileJsRules"]{}
@@ -27,11 +30,11 @@
 }
 
 .subform-repeatable-group[data-base-name="fileJsRules"] .control-group:nth-child(2) {
-    width: 50%;
+    /* width: 50%; */
 }
 
 .subform-repeatable-group[data-base-name="fileJsRules"] .control-group:nth-child(3) {
-    width: 50%;
+    /* width: 50%; */
 }
 
 .subform-repeatable-group[data-base-name="fileJsRules"] .control-label {

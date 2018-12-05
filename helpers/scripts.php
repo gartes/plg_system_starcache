@@ -28,10 +28,6 @@
 		
 		}#END FUN
 		
-		
-		
-		
-		
 		/**
 		 * Обновить в параметрах пллагина  MediaVersion
 		 *
@@ -45,8 +41,6 @@
 		 */
 		public static function updateMediaVersion ( $jPlugin )
 		{
-			
-			
 			$mediaVersion = JUserHelper::genRandomPassword( $length = 16 );
 			$jPlugin->params->set( 'mediaVersion', $mediaVersion );
 			
@@ -75,11 +69,14 @@
 		public static function _removeScripts ( \PlgSystemStarcache &$Starcache , $doc )
 		{
 			$regex        = self::_prepExclude( (array) $Starcache->params->get( 'scripts', [] ) );
-			$rules = self::_prepareRules($Starcache->params->get('fileJsRules') , array() );
 			
+			$rules = \starcache\helpers\helper::_prepareRules( $Starcache->params->get('fileJsRules')     );
+		 
 			
 			$matched      = [];
 			$regexinclude = $Starcache->params->get( 'include', false );
+			
+			
 			
 			foreach ( $regex as $r )
 			{
@@ -97,8 +94,10 @@
 				# Если есть в правилах загрузки
 				if (isset($rules[$src])){
 					
+					
+					
 					# Если отмечено не загружать
-					if ( !isset($rules[$src]->load)) {
+					if ( !$rules[$src]->load ) {
 						unset( $doc->_scripts[ $src ] );
 						continue;
 					}#END IF
@@ -157,10 +156,20 @@
 			}#END FOREACH
 			
 			// xzlib.js
-			//    echo'<pre>';print_r( $Starcache->_scripts );echo'</pre>'.__FILE__.' '.__LINE__;
+			//     echo'<pre>';print_r( $Starcache->_scripts );echo'</pre>'.__FILE__.' '.__LINE__;
 			
 		}#END FUN
 		
+		/**
+		 * @param $src
+		 * @param $attribs
+		 * @param $doc
+		 *
+		 * @author    Gartes
+		 *
+		 * @since     3.8
+		 * @copyright 04.12.18
+		 */
 		private static function _createPreloadTag( $src , $attribs , $doc ){
 			if ( !$attribs['preload']) return ;
 			$tag = '<link rel="preload" href="'.$src.'" as="script">';
@@ -168,30 +177,7 @@
 		}#END FUN
 		
 		
-		/**
-		 * Подготовка правил загрузки JS Файлов из настроек плагина 
-		 * @param $reules
-		 *
-		 * @return array
-		 * @author    Gartes
-		 *
-		 * @since     3.8
-		 * @copyright 04.12.18
-		 */
-		private static function _prepareRules ( $reules )
-		{
-			
-			$ret = [];
-			foreach ( $reules as $r )
-			{
-				$ret[ $r->file ] = $r;
-				
-				
-				
-			}#END FOREACH
-			
-			return $ret;
-		}#END FUN
+		
 		
 		
 		/**

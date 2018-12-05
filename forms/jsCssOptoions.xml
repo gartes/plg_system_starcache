@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+    <fieldset name="section1" label="Section1">
+        <!-- Версия   -->
+        <field name="verType" type="radio"
+               default="0"
+
+               label="PLG_STARCACHE_CSS_VER_TYPE"
+               description="" class="btn-group btn-group-yesno">
+            <option value="1">ID</option>
+            <option value="0">AUTO</option>
+        </field>
+        <!-- ASYNC -->
+        <!-- Новый файл -->
+        <field name="version"
+               showon="verType:1"     type="text" label="PLG_STARCACHE_CSS_VER_FILE" size="20"/>
+
+
+
+        <field name="relative" type="radio"
+               default="1"
+                label="PLG_STARCACHE_CSS_RELATIVE_URL"
+               description="" class="btn-group btn-group-yesno">
+            <option value="1">RELATIVE</option>
+            <option value="0">ABSOLUTE</option>
+        </field>
+
+
+
+    </fieldset>
+</form>

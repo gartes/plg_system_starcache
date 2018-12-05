@@ -13,6 +13,10 @@
             <option value="0">JNO</option>
         </field>
 
+        <field name="media" showon="load:1"   type="text" label="media" description="screen and (max-device-width: 799px)" size="50"/>
+        <field name="type"  showon="load:1" readonly="1"    default="text/css"   type="text"   size="10"/>
+
+
 
         <!-- override -->
         <field name="override"
@@ -30,27 +34,21 @@
         <field name="preload" type="radio"
                default="0"
                label="PRELOAD"
-               showon="load:1[AND]defer:0[AND]async:0"
+               showon="load:1"
                description="" class="btn-group btn-group-yesno">
             <option value="1">JYES</option>
             <option value="0">JNO</option>
         </field>
-        <!-- DEFER  -->
-        <field name="defer" type="radio"
-               default="0"
-               showon="load:1[AND]preload:0"
-               label="DEFER"
-               description="" class="btn-group btn-group-yesno">
-            <option value="1">JYES</option>
-            <option value="0">JNO</option>
-        </field>
-        <!-- ASYNC -->
-        <field name="async" type="radio"
-               showon="load:1[AND]preload:0"
-               default="0" label="ASYNC" description="" class="btn-group btn-group-yesno">
-            <option value="1">JYES</option>
-            <option value="0">JNO</option>
-        </field>
+
+        <field name="options"
+               type="subform"
+
+               formsource="plugins/system/starcache/forms/jsCssOptoions.xml"
+               label="Optoions"
+              />
+
+
+
 
 
 

@@ -8,6 +8,7 @@
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 	
+	use starcache\helpers\helper;
 	use starcache\helpers\scripts;
 	use starcache\helpers\css;
 	use starcache\helpers\admin;
@@ -113,227 +114,6 @@ class PlgSystemStarcache extends \JPlugin
 		
 		// echo'<pre>';print_r( $this->_cache );echo'</pre>'.__FILE__.' '.__LINE__;
 	}#END FN
-    
-    /**
-     * Перед созданием HEAD
-     *
-     * @since 3.8
-     *
-     */
-	public function onBeforeCompileHead ()
-	{
-		
-		
-		if ( $this->app->isAdmin() ) {
-			admin::addJS();
-			
-			return;
-		}
-		
-		$doc = JFactory::getDocument();
-		
-		# CSS Оптимизация
-		  $this->AllCss =  css::getAllCss();
-		 css::downCss( $doc );
-		
-		# Поддержка Virtuemart
-		if ($this->params->get('supportVirtuemart' , false)){
-			vmJsApi::writeJS();
-		}
-		
-		
-		# Перенос скриптов вниз
-		if ( $this->params->get( 'downJsScript', false ) ){
-			# вырезать все Scripts - Записать  в $this->_scripts
-			scripts::_removeScripts( $this, $doc );
-		}#END IF
-		
-		
-		
-		//		defer
-		// $this->_scripts['/media/jui/js/bootstrap.min.js']['defer'] = 1 ;
-		
-	   //echo'<pre>';print_r( $this->_scripts );echo'</pre>'.__FILE__.' '.__LINE__;
-		
-		# Переносить Декларации JS вниз
-		if ($this->params->get('downJsDeclarations', false))
-		{
-			$this->_script = $doc->_script['text/javascript'];
-			unset($doc->_script['text/javascript']);
-		}#END IF
-		
-		
-		
-		
-		
-		
-	}#END FN
-	
-	
-	
-	
-	/**
-	 * После создания тела страницы
-	 *
-	 * @throws Exception
-	 * @author    Gartes
-	 *
-	 * @since     3.8
-	 * @copyright 01.12.18
-	 */
-    public function onAfterRender(){
-		if (JFactory::getApplication()->isAdmin()){	return;  }
-		
-		$downJsDeclarations = $this->params->get( 'downJsDeclarations', false ) ;
-		$downJsSherchBody = $this->params->get( 'downJsSherchBody', false ) ;
-		
-		# Перенос тегов <script /> из тела старницы в низ
-	    # Вырезать и сохранить в переменной public $_ScrptInBody
-	    if ( $downJsDeclarations &&  $downJsSherchBody )
-	    {
-		     scripts::_excludeScriptInBody($this);
-	    }#END IF
-	
-	   
-	    
-		# Если есть скрипты для переноса
-	    # опустить скрипты вниз
-	    if (count($this->_scripts))
-	    {
-		   scripts::_moveScripts($this);
-	    }#END IF
-	
-	
-	    
-	    
-	    # Если установлено переносить декларативы из HEAD вниз страницы
-	    if ( $downJsDeclarations )
-	    {
-		   scripts::_moveScript($this);
-		    if ( $downJsSherchBody )
-		    {
-			   scripts::_includeScriptInBody($this);
-				   
-		    }#END IF
-	    }#END IF
-	 
-	    # Установить критические стили
-	     starcache\helpers\css::getCriticalCss(   $this->AllCss );
-	    
-	    
-	
-	    
-	    
-	    
-    }#END FN
-	
-	/**
-	 * @throws Exception
-	 * @author    Gartes
-	 * @since     3.8
-	 * @copyright 28.11.18
-	 */
-	public function onAfterRoute(){
-		
-        $doc = JFactory::getDocument();
-         
-        #Режим USER ?
-	    $user_view_param = $this->params->get( 'ukcpu_lib_view', false );
-        #ID Медиа версии
-	    $mediaVersion = $this->params->get( 'mediaVersion', false );
-		
-		#Если включен режим ращработчика
-		#или mediaVersion - не установлена == 0
-		// TODO  ( !$user_view_param  && 1 ) - 1 == Admin IP Address  in array this params
-		if ( ($user_view_param && !$mediaVersion ) || ( !$user_view_param  && 1 )     )
-		{
-			#Обновить в параметрах пллагина  MediaVersion
-			$mediaVersion = scripts::updateMediaVersion($this);
-		
-		}#END IF
-		
-		#Установить ID Медиа версии
-		$doc->setMediaVersion( $mediaVersion );
-        
-		
-		
-        # config class ukcpuDocument
-        $ukcpuDoc_options = array (
-        
-        
-       
-        
-                    // developer  ||  user
-        
-        'view'          =>      ( $user_view_param ? 'user' :'developer' )       ,
-        'mediaVersion'  =>      $mediaVersion , 
-        'cache'         =>      true                , // Кешировать результаты true || false
-        /**
-         * пергрузка кеша true || false
-         * Используеться при @param view == user
-         * Всегда если @param view == developer
-         * DEF - false  
-         */ 
-        'cacheReload'   =>  false       , 
-        'comment'       =>  true        ,
-        /**
-         *  НЕ ОБЯЗАТЕЛЬНЫЙ - 
-         *  глобальная настройка для объекта ukcpuDocument метода addScriptDeclaration
-         *  можно передать при вызове самого метода 
-         *  $option = array ( 
-         *          'compressorCss' => true ,  
-         *  
-         *  );
-         *  $uDoc->addStyleDeclaration ($styleArr , $option ) ;
-         * 
-         */ 
-        //'addScriptDeclaration'=> array (
-            /**
-             * Сжатие CSS true || false
-             * DEF - true 
-             */ 
-           // 'compressorCss'    =>  false    , 
-       // ),
-        );    
-      //  $uDoc = ukcpuDocument::getDocument( $ukcpuDoc_options );
-    
-    }#END FN
-    
-	
-	
-	
-    
-	
-	
-	/**
-	 * Get a cache key for the current page based on the url and possible other factors.
-	 * Получите ключ кеша для текущей страницы на основе URL-адреса и возможных других факторов.
-	 * @return  string
-	 *
-	 * @throws Exception
-	 * @since   3.7
-	 */
-	protected function getCacheKey()
-	{
-		static $key;
-
-		if (!$key)
-		{
-			
-            $jinput = JFactory::getApplication()->input; 
-            JPluginHelper::importPlugin('pagecache');
-
-			$parts = JEventDispatcher::getInstance()->trigger('onPageCacheGetKey');
-			$parts[] = JUri::getInstance()->toString();
-            
-            $parts[] = $jinput->cookie->get('cookieNotice', null, 'bool');
-            
-			$key = md5(serialize($parts));
-		}#END IF
-
-		return $key;
-	}#END FN
-	
 	
 	/**
 	 * Converting the site URL to fit to the HTTP request.
@@ -346,69 +126,187 @@ class PlgSystemStarcache extends \JPlugin
 	public function onAfterInitialise()
 	{
 		$app  = $this->app;
-        $user = JFactory::getUser();
+		$user = JFactory::getUser();
 		
-        // Кеш отключен в настройках плагина
-        if (  !$this->params->get('cache_on', false) ){
-           return;
-        }#END IF
+		// Кеш отключен в настройках плагина
+		if (  !$this->params->get('cache_on', false) ){
+			return;
+		}#END IF
 		
 		if ($app->isClient('administrator'))
 		{
 			return;
-		}
+		}#END IF
 		
 		if (count($app->getMessageQueue()))
 		{
 			return;
-		}
+		}#END IF
 		
-		// Если какие-либо плагины pagecache возвращают false для onPageCacheSetCaching, не используется кеш.
+		# Если какие-либо плагины pagecache возвращают false для onPageCacheSetCaching, не используется кеш.
 		JPluginHelper::importPlugin('pagecache');
 		$results = JEventDispatcher::getInstance()->trigger('onPageCacheSetCaching');
-		 
 		
-		
-		
-		
-        // только именно false - строгое соответствие
-        $caching = !in_array(false, $results, true);
-		
-		 
+		// только именно false - строгое соответствие
+		$caching = !in_array(false, $results, true);
 		
 		if ($caching && $user->get('guest') && $app->input->getMethod() == 'GET')
 		{
 			$this->_cache->setCaching(true);
-		}
-		
-		
-		
-		$data = $this->_cache->get($this->getCacheKey());
+		}#END IF
+		$data = $this->_cache->get( helper::getCacheKey() );
 		
 		if ($data !== false)
 		{
 			// Set cached body.
 			$app->setBody($data);
 			
-			$r = $app->toString() ;
-			echo $r ;
+			echo $app->toString() ;
 			
 			if (JDEBUG)
 			{
 				JProfiler::getInstance('Application')->mark('afterCache');
-			}
-
+			}#END IF
+			
 			$app->close();
-		}
+		}#END IF
+	}#END FN
+	
+	/**
+	 *
+	 * @throws Exception
+	 * @author    Gartes
+	 * @since     3.8
+	 * @copyright 28.11.18
+	 */
+	public function onAfterRoute(){
+		
+		$doc = JFactory::getDocument();
+		
+		#Режим USER ?
+		$user_view_param = $this->params->get( 'ukcpu_lib_view', false );
+		#ID Медиа версии
+		$mediaVersion = $this->params->get( 'mediaVersion', false );
+		
+		#Если включен режим ращработчика
+		#или mediaVersion - не установлена == 0
+		// TODO  ( !$user_view_param  && 1 ) - 1 == Admin IP Address  in array this params
+		if ( ($user_view_param && !$mediaVersion ) || ( !$user_view_param  && 1 )     )
+		{
+			#Обновить в параметрах пллагина  MediaVersion
+			$mediaVersion = scripts::updateMediaVersion($this);
+			
+		}#END IF
+		
+		#Установить ID Медиа версии
+		$doc->setMediaVersion( $mediaVersion );
+	
+	}#END FN
+	
+    /**
+     * Перед созданием HEAD
+     *
+     * @since 3.8
+     *
+     */
+	public function onBeforeCompileHead ()
+	{
+		if ( $this->app->isAdmin() ) {
+			
+			# Установить CSS Для страницы настроек поагина
+			admin::addJS();
+			
+			return;
+		}#END IF
+		
+		$doc = JFactory::getDocument();
+		
+		# CSS Оптимизация
+		$this->AllCss =  css::getAllCss();
+		#Создать  отложенную загрузку для CSS файлов
+		css::downCss( $doc , $this->params );
 		
 		
-	}
+		
+		# Поддержка Virtuemart
+		if ($this->params->get('supportVirtuemart' , false)){
+			vmJsApi::writeJS();
+		}#END IF
+		
+		
+		# Перенос скриптов вниз
+		if ( $this->params->get( 'downJsScript', false ) ){
+			# вырезать все Scripts - Записать  в $this->_scripts
+			scripts::_removeScripts( $this, $doc );
+		}#END IF
+		
+		# Переносить Декларации JS вниз
+		if ($this->params->get('downJsDeclarations', false))
+		{
+			$this->_script = $doc->_script['text/javascript'];
+			unset($doc->_script['text/javascript']);
+		}#END IF
+	
+	}#END FN
 	
 	
 	/**
-	 *      https://issues.joomla.org/tracker/joomla-cms/8890
+	 * После создания тела страницы
 	 *
+	 * @throws Exception
+	 * @author    Gartes
+	 *
+	 * @since     3.8
+	 * @copyright 01.12.18
+	 */
+	public function onAfterRender ()
+	{
+		
+		if ( JFactory::getApplication()->isAdmin() )
+		{
+			return;
+		}
+		
+		$downJsDeclarations = $this->params->get( 'downJsDeclarations', false );
+		$downJsSherchBody   = $this->params->get( 'downJsSherchBody', false );
+		
+		# Перенос тегов <script /> из тела старницы в низ
+		# Вырезать и сохранить в переменной public $_ScrptInBody
+		if ( $downJsDeclarations && $downJsSherchBody )
+		{
+			scripts::_excludeScriptInBody( $this );
+		}#END IF
+		
+		
+		# Если есть скрипты для переноса
+		# опустить скрипты вниз
+		if ( count( $this->_scripts ) )
+		{
+			scripts::_moveScripts( $this );
+		}#END IF
+		
+		# Если установлено переносить декларативы из HEAD вниз страницы
+		if ( $downJsDeclarations )
+		{
+			scripts::_moveScript( $this );
+			if ( $downJsSherchBody )
+			{
+				scripts::_includeScriptInBody( $this );
+				
+			}#END IF
+		}#END IF
+		
+		# Установить критические стили
+		starcache\helpers\css::getCriticalCss( $this->AllCss );
+	}#END FN
+	
+	
+	/**
+	 * После отправки страницы если она взята не из кеша
+	 *
+	 * Установка кеша
 	 * After render.
+	 * https://issues.joomla.org/tracker/joomla-cms/8890
 	 *
 	 * @return   void
 	 *
@@ -440,13 +338,10 @@ class PlgSystemStarcache extends \JPlugin
 		if ( $user->get( 'guest' ) && !$this->isExcluded() )
 		{
 			#We need to check again here, because auto-login plugins have not been fired before the first aid check.
-			$this->_cache->store( null, $this->getCacheKey() );
+			$this->_cache->store( null, helper::getCacheKey() );
 		}#END IF
-		
-		
-		
 	}#END FN
-
+	
 	/**
 	 * Проверьте, исключена ли страница из кеша или нет.
 	 *
@@ -511,8 +406,6 @@ class PlgSystemStarcache extends \JPlugin
 	}#END FN
 	
 	
-	
-	
 	/**
 	 *  Получение данных Ajax
 	 * для изменения настроек плагина
@@ -520,74 +413,75 @@ class PlgSystemStarcache extends \JPlugin
 	 * @since 3.8
 	 *
 	 */
-	public function onAjaxStarcache (){
+	public function onAjaxStarcache ()
+	{
 		
 		
+		jimport( 'ukcpu.extensions.extensions' );
 		
-		
-		
-		jimport('ukcpu.extensions.extensions');
-		
-		$pluginData  = ukcpuExtensions::getItemByElement('starcache', 'plugin', 'system') ;
-		$extensionsId = $pluginData ['extension_id'];
+		$pluginData   = ukcpuExtensions::getItemByElement( 'starcache', 'plugin', 'system' );
+		$extensionsId = $pluginData [ 'extension_id' ];
 		
 		$jinput = JFactory::getApplication()->input;
-		$opt = $jinput->get('data' , null , 'array' ) ;
+		$opt    = $jinput->get( 'data', null, 'array' );
 		
 		
-		if (!class_exists( 'CacheModelCache' ))
-			require(JPATH_ROOT .'/administrator/components/com_cache/models/cache.php');
+		if ( !class_exists( 'CacheModelCache' ) )
+			require( JPATH_ROOT . '/administrator/components/com_cache/models/cache.php' );
 		$modelCache = new CacheModelCache();
-		$allCleared = true ;
-		$clients    = array(1, 0);
+		$allCleared = true;
+		$clients    = [ 1, 0 ];
 		
-		foreach ($clients as $client)
+		foreach ( $clients as $client )
 		{
-			$mCache    = $modelCache->getCache($client);
-			$clientStr = JText::_($client ? 'JADMINISTRATOR' : 'JSITE') .' > ';
+			$mCache    = $modelCache->getCache( $client );
+			$clientStr = JText::_( $client ? 'JADMINISTRATOR' : 'JSITE' ) . ' > ';
 			
-			foreach ($mCache->getAll() as $cache)
+			foreach ( $mCache->getAll() as $cache )
 			{
-				if ($mCache->clean($cache->group) === false)
+				if ( $mCache->clean( $cache->group ) === false )
 				{
-					$this->app->enqueueMessage(JText::sprintf('Ошибка очистки кеша ', $clientStr . $cache->group), 'error');
+					$this->app->enqueueMessage( JText::sprintf( 'Ошибка очистки кеша ', $clientStr . $cache->group ), 'error' );
 					$allCleared = false;
 				}
 			}
 		}
-		if ($allCleared)
+		if ( $allCleared )
 		{
 			
-			$this->app->enqueueMessage(JText::_('<b>Кеш очищен</b>.') , 'message' );
+			$this->app->enqueueMessage( JText::_( '<b>Кеш очищен</b>.' ), 'message' );
 			
 		}
 		else
 		{
-			$this->app->enqueueMessage(JText::_('<b>Кеш очищен не полностью</b>.'), 'warning');
+			$this->app->enqueueMessage( JText::_( '<b>Кеш очищен не полностью</b>.' ), 'warning' );
 		}
 		
-		switch ($opt['el']){
+		switch ( $opt[ 'el' ] )
+		{
 			
 			// Переключение загрузки "user" - "developer"
 			case 'lib_view' :
 				try
 				{
-					$newMediaVersion = JUserHelper::genRandomPassword ($length = 8) ;
+					$newMediaVersion = JUserHelper::genRandomPassword( $length = 8 );
 					
 					$user_view_param = $this->params->get( 'ukcpu_lib_view', false );
-					$this->params->set('ukcpu_lib_view' , ( $user_view_param ? 0 : 1 ) ) ;
-					$this->params->set('cache_on' , ( $user_view_param ? 0 : 1 ) ) ;
-					$this->params->set('mediaVersion' , $newMediaVersion ) ;
+					$this->params->set( 'ukcpu_lib_view', ( $user_view_param ? 0 : 1 ) );
+					$this->params->set( 'cache_on', ( $user_view_param ? 0 : 1 ) );
+					$this->params->set( 'mediaVersion', $newMediaVersion );
 					
 					
-					$R = ukcpuExtensions::saveParametersExtensions( $extensionsId, $this->params ) ;
-					$this->app->enqueueMessage('Медиа версия изменена - Media Version = <b>' . $newMediaVersion .'</b>'  );
-					$this->app->enqueueMessage('JCahe <b>' . ( $user_view_param ? 'Отключен' : 'Включен' ) .'</b>.');
-					$this->app->enqueueMessage('Включен режим <b>' . ( $user_view_param ? 'Dev.' : 'User' ).'</b>' );
+					$R = ukcpuExtensions::saveParametersExtensions( $extensionsId, $this->params );
+					$this->app->enqueueMessage( 'Медиа версия изменена - Media Version = <b>' . $newMediaVersion . '</b>' );
+					$this->app->enqueueMessage( 'JCahe <b>' . ( $user_view_param ? 'Отключен' : 'Включен' ) . '</b>.' );
+					$this->app->enqueueMessage( 'Включен режим <b>' . ( $user_view_param ? 'Dev.' : 'User' ) . '</b>' );
 					
 					
-				}catch(Exception $e){
-					echo new JResponseJson($e);
+				}
+				catch ( Exception $e )
+				{
+					echo new JResponseJson( $e );
 				}
 				
 				break;
@@ -595,21 +489,19 @@ class PlgSystemStarcache extends \JPlugin
 				try
 				{
 					$cache_on = $this->params->get( 'cache_on', false );
-					$this->params->set('cache_on' , ( $cache_on ? 0 : 1 ) ) ;
-					$R = ukcpuExtensions::saveParametersExtensions( $extensionsId, $this->params ) ;
-					$this->app->enqueueMessage('JCahe <b>' . (  $cache_on ? 'Отключен' : 'Включен' ) .'</b>.');
-				}catch(Exception $e){
-					echo new JResponseJson($e);
+					$this->params->set( 'cache_on', ( $cache_on ? 0 : 1 ) );
+					$R = ukcpuExtensions::saveParametersExtensions( $extensionsId, $this->params );
+					$this->app->enqueueMessage( 'JCahe <b>' . ( $cache_on ? 'Отключен' : 'Включен' ) . '</b>.' );
+				}
+				catch ( Exception $e )
+				{
+					echo new JResponseJson( $e );
 				}
 				break;
 		}
 		echo new JResponseJson( json_decode( $this->params ) );
 		jExit();
 	}#END FN
-	
-	
-	
-	
 	
 	
 }#END CLASS
