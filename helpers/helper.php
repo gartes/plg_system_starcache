@@ -20,6 +20,29 @@
 	
 	class helper
 	{
+	
+		public static function preconnectHendler($PLG){
+			$preconnectRules = $PLG->params->get('preconnectRules' , [] );
+			if (!count($preconnectRules)) return ;
+			
+			$doc = JFactory::getDocument();
+			
+			
+			foreach ($preconnectRules as $Rules) {
+				if ( !$Rules->Published )  continue ;
+				//
+				$tag = '<link rel="'. $Rules->type.'" ' ;
+				$tag .='href="'. $Rules->url .'" ';
+				$tag .= ($Rules->type_preloaded ? 'as="'.$Rules->type_preloaded.'"' : '' ) ; 
+				$tag .='>';
+				$doc->addCustomTag( $tag );
+//				echo'<pre>';print_r( $Rules );echo'</pre>'.__FILE__.' '.__LINE__;
+			}#END FOREACH
+			
+		}#END FN
+	 
+	
+		
 		/**
 		 * Get a cache key for the current page based on the url and possible other factors.
 		 * Получите ключ кеша для текущей страницы на основе URL-адреса и возможных других факторов.
@@ -99,8 +122,26 @@
 			return $retArr ;
 			
 		}#END FN
-
 		
+		/**
+		 * Сохранить параметры плагина
+		 * @param $PLG
+		 *
+		 * @throws \Exception
+		 * @author    Gartes
+		 *
+		 * @since     3.8
+		 * @copyright 06.12.18
+		 */
+		public static function saveParams( &$PLG ){
+			
+			$Plg = new \stdClass();
+			$Plg->_name = 'starcache';
+			$Plg->_type = 'system';
+			$zazExtensions = new \Core\extensions\zazExtensions();
+			$PlgId = $zazExtensions->getJoomlaPluginId($Plg) ;
+			$zazExtensions->updateExtensionParams( $PLG->params->toString() , $PlgId );
+		}#END FN
 		
 		/**
 		 * Подготовка правил загрузки JS Файлов из настроек плагина

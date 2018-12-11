@@ -200,6 +200,17 @@
 
 			</fieldset>
 
+			<!-- Preconnect -->
+			<fieldset name="preconnect">
+
+
+				<field name="preconnectRules"
+					   type="subform"
+					   multiple="true"
+					   formsource="plugins/system/starcache/forms/preconnectSetting.xml"
+					   label="Link As"
+					   description="" />
+			</fieldset>
 
 
 			<fieldset name="advanced">

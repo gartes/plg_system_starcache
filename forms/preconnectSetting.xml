@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+    <fieldset name="section1" label="Section1">
+        <!-- https://developers.google.com/web/fundamentals/performance/resource-prioritization#preconnect -->
+
+        <field name="Published" type="radio"
+               default="1"
+               label="Published"
+               description="" class="btn-group btn-group-yesno">
+            <option value="1">JON</option>
+            <option value="0">JOFF</option>
+        </field>
+
+        <!-- Url Файла -->
+        <field name="url" type="text" label="URL" size="50"/>
+
+
+
+        <!-- Загружать -->
+        <field name="type" type="list" default="" label="Type" description="" class="">
+            <option value="preload">preload</option>
+            <option value="preconnect">preconnect</option>
+            <option value="dns-prefetch">dns-prefetch</option>
+            <option value="prefetch">prefetch</option>
+        </field>
+
+        <!-- Загружать -->
+        <field name="type_preloaded" type="list" default="" label="Type" description="" class="">
+            <option value=""></option>
+            <option value="font">font</option>
+            <option value="image">image</option>
+            <option value="script">script</option>
+            <option value="style">style</option>
+
+        </field>
+
+    </fieldset>
+</form>

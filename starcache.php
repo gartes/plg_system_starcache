@@ -208,12 +208,16 @@ class PlgSystemStarcache extends \JPlugin
 		defined('VM_JS_VER') or define('VM_JS_VER', $mediaVersion);
 	}#END FN
 	
-    /**
-     * Перед созданием HEAD
-     *
-     * @since 3.8
-     *
-     */
+	/**
+	 * Перед созданием HEAD
+	 *
+	 *
+	 * @throws Exception
+	 * @author    Gartes
+	 *
+	 * @since     3.8
+	 * @copyright 06.12.18
+	 */
 	public function onBeforeCompileHead ()
 	{
 		if ( $this->app->isAdmin() ) {
@@ -229,7 +233,7 @@ class PlgSystemStarcache extends \JPlugin
 		# CSS Оптимизация
 		$this->AllCss =  css::getAllCss();
 		#Создать  отложенную загрузку для CSS файлов
-		css::downCss( $doc , $this->params );
+		css::downCss( $this , $doc   );
 		
 		
 		
@@ -245,13 +249,25 @@ class PlgSystemStarcache extends \JPlugin
 			scripts::_removeScripts( $this, $doc );
 		}#END IF
 		
+		
+		helper::preconnectHendler($this);
+		
+		
+		
 		# Переносить Декларации JS вниз
 		if ($this->params->get('downJsDeclarations', false))
 		{
 			$this->_script = $doc->_script['text/javascript'];
 			unset($doc->_script['text/javascript']);
 		}#END IF
-	
+		
+		
+		
+		
+		if ($this->params->get('upDateParams' , false )){
+			\starcache\helpers\helper::saveParams($this);
+		}#END IF
+		
 	}#END FN
 	
 	

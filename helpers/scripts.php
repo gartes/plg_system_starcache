@@ -70,7 +70,7 @@
 		
 		 
 		
-		public static function _removeScripts ( \PlgSystemStarcache &$Starcache , $doc )
+		public static function _removeScripts (   $Starcache , $doc )
 		{
 			$regex        = self::_prepExclude( (array) $Starcache->params->get( 'scripts', [] ) );
 			
@@ -153,50 +153,12 @@
 //			echo'<pre>';print_r( $_saveData );echo'</pre>'.__FILE__.' '.__LINE__;
 			$doc->_scripts=[];
 			$Starcache->_scripts = $_scripts ;
-			# Сохранить параметры JS
-			self::saveJsParam ( $_saveData );
-			 
 			
+			$jsRules->filejsRules = $_saveData ;
+			$Starcache->params->set('upDateParams' , 2);
+			$Starcache->params->set('jsSetting' , $jsRules );
 		}#END FUN
 		
-		/**
-		 * Сохранить в параметрах плагина
-		 *
-		 * @param $_saveData
-		 *
-		 * @throws \Exception
-		 * @author    Gartes
-		 *
-		 *
-		 *
-		 * @since     3.8
-		 * @copyright 05.12.18
-		 */
-		private static function saveJsParam ( $_saveData ){
-			
-			
-//			echo'<pre>';print_r( $_saveData );echo'</pre>'.__FILE__.' '.__LINE__;
-			
-			# Получить параметры плагина
-			$param = \Core\extensions\zazExtensions::getParamsPlugin('system' , 'starcache' ) ;
-			$jsSetting = $param->get('jsSetting' , false );
-			$jsSetting->filejsRules = $_saveData;
-			
-			$param->set('jsSetting' , $jsSetting );
-			
-			# Сохранить параметры
-			$Plg = new \stdClass();
-			$Plg->_name = 'starcache';
-			$Plg->_type = 'system';
-			$zazExtensions = new \Core\extensions\zazExtensions();
-			$PlgId = $zazExtensions->getJoomlaPluginId($Plg) ;
-			 $zazExtensions->updateExtensionParams( $param->toString() , $PlgId );
-			
-			
-			// echo'<pre>';print_r( $jsSetting );echo'</pre>'.__FILE__.' '.__LINE__;
-			
-			
-		}#END FUN
 		
 		
 		
