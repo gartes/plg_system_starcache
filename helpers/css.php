@@ -54,7 +54,13 @@
 			$app = \JFactory::getApplication() ;
 			$bodyHtml  = $app->getBody() ;
 			
-			$fileCss = self::createFileAllCss( $allCss['file'] , $app );
+			$penthouse = $app->input->get('penthouse' , false ) ;
+			
+			
+			echo'<pre>';print_r( $app->input->get('penthouse' , false ) );echo'</pre>'.__FILE__.' '.__LINE__;
+			
+			
+			
 			
 			#Адрес текущей страницы
 			$uri = \JFactory::getURI();
@@ -73,12 +79,18 @@
 			
 			// создаем кэш если пустой
 			if (  empty ( $output )  )  {
-				if ( !class_exists( 'Optimize\zazOptimize' ) ) require JPATH_LIBRARIES . '/zaz/Optimize/zazOptimize.php';
-				$css = new \Optimize\css\cssOptimize();
-				$res = $css->sendPost($fileCss , $url);
-				$data = json_decode($res  )  ;
-				$output = file_get_contents($data->Url);
-				$cache -> store ( $output ,  $urlMd5 ) ;
+				if (!$penthouse){
+					# Сохранить все чтиле в файле
+					$fileCss = self::createFileAllCss( $allCss['file'] , $app );
+					if ( !class_exists( 'Optimize\zazOptimize' ) ) require JPATH_LIBRARIES . '/zaz/Optimize/zazOptimize.php';
+					$css = new \Optimize\css\cssOptimize();
+					# отправить запрос к penthouse
+					$res = $css->sendPost( $fileCss , $url.'?penthouse=1' );
+					$data = json_decode($res  )  ;
+					$output = file_get_contents($data->Url);
+					// $cache -> store ( $output ,  $urlMd5 ) ;
+				}
+				
 			}#END IF
 			
 			//echo'<pre>';print_r( $urlMd5 );echo'</pre>'.__FILE__.' '.__LINE__;

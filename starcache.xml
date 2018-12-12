@@ -199,6 +199,22 @@
 				</fields>
 
 			</fieldset>
+			<fieldset name="Critical css">
+				<fields name="criticalCssSetting">
+					<!-- Критические стили в файле -->
+
+					<field name="loadCssAsFile"
+							type="radio"
+							label="PLG_CACHE_CSS_SETTING_LOAD_CSS_AS_FILE_LABEL"
+							description="PLG_CACHE_CSS_SETTING_LOAD_CSS_AS_FILE_DESC"
+							class="btn-group btn-group-yesno"
+							default="0"
+					>
+						<option value="1">JYES</option>
+						<option value="0">JNO</option>
+					</field>
+				</fields>
+			</fieldset>
 
 			<!-- Preconnect -->
 			<fieldset name="preconnect">
