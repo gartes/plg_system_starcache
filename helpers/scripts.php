@@ -7,6 +7,9 @@
 	use JUserHelper;
 	use vmJsApi;
 	
+	include_once JPATH_LIBRARIES . '/zaz/Core/vendor/autoload.php' ;
+	
+	
 	/**
 	 * @package     helpers
 	 * @subpackage
@@ -67,9 +70,6 @@
 		 *
 		 * @throws \Exception
 		 */
-		
-		 
-		
 		public static function _removeScripts (   $Starcache , $doc )
 		{
 			$regex        = self::_prepExclude( (array) $Starcache->params->get( 'scripts', [] ) );
@@ -152,7 +152,13 @@
 			
 //			echo'<pre>';print_r( $_saveData );echo'</pre>'.__FILE__.' '.__LINE__;
 			$doc->_scripts=[];
+			
+			
+			$jsOptimize = new \Optimize\js\jsOptimize();
+			$_scripts = $jsOptimize->addLazyLoadingJs ( $_scripts );
+			
 			$Starcache->_scripts = $_scripts ;
+			
 			
 			$jsRules->filejsRules = $_saveData ;
 			$Starcache->params->set('upDateParams' , 2);
@@ -287,10 +293,27 @@
 			$app = JFactory::getApplication();
 			$body = $app->getBody();
 			
+			
+			$delayed_loading = [] ;
+			
 			foreach ($Starcache->_scripts as $src => $attribs)
 			{
-				$body = str_replace('</body>', self::_renderScript($Starcache ,  $src, $attribs) . "</body>", $body);
-			}
+				# Если включена отложенная загрузка скрипта
+				if($attribs->delayed_loading){
+					$delayed_loading[$attribs->delayed_loading_time][$src] = $attribs ;
+					
+				}else{
+					$script = self::_renderScript($Starcache ,  $src, $attribs)  ;
+					$body = str_replace('</body>', $script. "</body>", $body);
+				
+				}#END IF
+				
+				
+				
+				
+				
+				
+			}#END FOREACH
 			$app->setBody($body);
 		}#END FUN
 		

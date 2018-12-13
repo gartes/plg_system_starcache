@@ -30,6 +30,23 @@
         <field name="overrideFile"
                showon="load:1[AND]override:1"   type="text" label="PLG_STARCACHE_JS_OVERRIDE_FILE_FILE" size="50"/>
 
+
+        <!-- Delayed loading - отложенная загрузка -->
+        <field name="delayed_loading"
+               showon="load:1"
+               type="radio" default="0" label="Delayed loading" description="" class="btn-group btn-group-yesno">
+            <option value="1">JYES</option>
+            <option value="0">JNO</option>
+        </field>
+
+        <field name="delayed_loading_time" type="list" default="" label="Delayed loading time" description=""
+               showon="load:1[AND]delayed_loading:1">
+            <option value="500">500</option>
+            <option value="1000">1000</option>
+            <option value="1500">1500</option>
+            <option value="2000">2000</option>
+            <option value="2500">2500</option>
+        </field>
         <!-- PRELOAD  -->
         <field name="preload" type="radio"
                default="0"

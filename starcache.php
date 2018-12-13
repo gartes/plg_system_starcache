@@ -17,8 +17,9 @@
 jimport('joomla.plugin.plugin');
 $PATH_autoload = JPATH_PLUGINS . "/system/starcache/vendor/autoload.php" ;
 require_once  $PATH_autoload ;
-
-
+	
+	defined('JPATH_STARCACHE_CRITICAL_CSS') or define('JPATH_STARCACHE_CRITICAL_CSS', JPATH_ROOT . DS . 'media'. DS . 'starcache'. DS . 'critical_css' );
+	defined('JPATH_STARCACHE_CRITICAL_CSS_BACKUP') or define('JPATH_STARCACHE_CRITICAL_CSS_BACKUP', JPATH_ROOT . DS . 'media'. DS . 'starcache'. DS . 'critical_css_backup' );
 
 //require 'vendor/autoload.php';
 
@@ -79,7 +80,7 @@ class PlgSystemStarcache extends \JPlugin
 	
 	
 	public $AllCss ;
-	
+	public $ConnectNoBd ;
 	
 	/**
 	 *  * Constructor.
@@ -170,11 +171,6 @@ class PlgSystemStarcache extends \JPlugin
 			
 			$app->close();
 		}#END IF
-		
-		
-		
-		
-		
 	}#END FN
 	
 	/**
@@ -232,8 +228,13 @@ class PlgSystemStarcache extends \JPlugin
 		
 		# CSS Оптимизация
 		$this->AllCss =  css::getAllCss();
-		#Создать  отложенную загрузку для CSS файлов
-		css::downCss( $this , $doc   );
+		
+		
+		$this->ConnectNoBd = css::testConnect ();
+		if ( $this->ConnectNoBd ) {
+			#Создать  отложенную загрузку для CSS файлов
+			css::downCss( $this , $doc   );
+		}
 		
 		
 		
@@ -252,16 +253,12 @@ class PlgSystemStarcache extends \JPlugin
 		
 		helper::preconnectHendler($this);
 		
-		
-		
 		# Переносить Декларации JS вниз
 		if ($this->params->get('downJsDeclarations', false))
 		{
 			$this->_script = $doc->_script['text/javascript'];
 			unset($doc->_script['text/javascript']);
 		}#END IF
-		
-		
 		
 		
 		if ($this->params->get('upDateParams' , false )){
@@ -306,6 +303,8 @@ class PlgSystemStarcache extends \JPlugin
 			scripts::_moveScripts( $this );
 		}#END IF
 		
+		
+		
 		# Если установлено переносить декларативы из HEAD вниз страницы
 		if ( $downJsDeclarations )
 		{
@@ -317,8 +316,11 @@ class PlgSystemStarcache extends \JPlugin
 			}#END IF
 		}#END IF
 		
+		
+		
+		
 		# Установить критические стили
-		starcache\helpers\css::getCriticalCss( $this->AllCss );
+		starcache\helpers\css::getCriticalCss( $this , $this->AllCss );
 	}#END FN
 	
 	

@@ -199,7 +199,9 @@
 				</fields>
 
 			</fieldset>
-			<fieldset name="Critical css">
+
+			<!-- Критические стили -->
+			<fieldset name="Critical_css">
 				<fields name="criticalCssSetting">
 					<!-- Критические стили в файле -->
 
@@ -213,6 +215,9 @@
 						<option value="1">JYES</option>
 						<option value="0">JNO</option>
 					</field>
+
+					<field name="beforeAddCriticalCss" type="textarea" default="" label="Before add critical css" description="" rows="15" cols="30" filter="raw"/>
+
 				</fields>
 			</fieldset>
 
